@@ -555,6 +555,7 @@
 #undef LUA_NUMBER_DOUBLE
 #undef LUA_NUMBER
 #undef LUA_IEEE754TRICK
+#undef LUA_MSASMTRICK
 #undef LUAI_UACNUMBER
 
 #undef lua_number2str
