@@ -186,6 +186,18 @@ static int pico8_tonum(lua_State *l) {
     return 1;
 }
 
+static int pico8_chr(lua_State *l) {
+    char s[2] = { (char)(uint8_t)lua_tonumber(l, 1), '\0' };
+    lua_pushstring(l, s);
+    return 1;
+}
+
+static int pico8_ord(lua_State *l) {
+    char const *s = lua_tostring(l, 1);
+    lua_pushnumber(l, *s ? (uint8_t)*s : 0);
+    return 1;
+}
+
 static void update_prng(global_State *g) {
     g->prngseed2 = g->prngseed1 + ((g->prngseed2 >> 16) | (g->prngseed2 << 16));
     g->prngseed1 += g->prngseed2;
@@ -230,6 +242,8 @@ static const luaL_Reg pico8lib[] = {
   {"rotr",  pico8_rotr},
   {"tostr", pico8_tostr},
   {"tonum", pico8_tonum},
+  {"chr",   pico8_chr},
+  {"ord",   pico8_ord},
   {"srand", pico8_srand},
   {"rnd",   pico8_rnd},
   {NULL, NULL}
