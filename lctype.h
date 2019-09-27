@@ -80,7 +80,7 @@ LUAI_DDEC const lu_byte luai_ctype_[UCHAR_MAX + 2];
 #include <ctype.h>
 
 
-#define lisspecial(c)	((int)(c) >= 0x80 && (int)(c) < 0x80 + 26)
+#define lisspecial(c)	(((int)(c) >= 0x10 && (int)(c) < 0x20) || (int)(c) >= 0x7f)
 #define lislalpha(c)	(isalpha(c) || (c) == '_' || lisspecial(c))
 #define lislalnum(c)	(isalnum(c) || (c) == '_' || lisspecial(c))
 #define lisdigit(c)	(isdigit(c))
