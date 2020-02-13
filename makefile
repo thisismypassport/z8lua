@@ -42,7 +42,7 @@ LIBS = -lm
 CORE_T=	liblua.a
 CORE_O=	lapi.o lcode.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o lmem.o \
 	lobject.o lopcodes.o lparser.o lstate.o lstring.o ltable.o ltm.o  \
-	lundump.o lvm.o lzio.o lctype.o
+	lundump.o lvm.o lzio.o lctype.o eris.o
 AUX_O=	lauxlib.o
 LIB_O=	lbaselib.o lcorolib.o ldblib.o ltablib.o lstrlib.o lpico8lib.o linit.o
 
@@ -156,5 +156,8 @@ lvm.o: lvm.c lua.h luaconf.h fix32.h ldebug.h lstate.h lobject.h \
  ltable.h lvm.h
 lzio.o: lzio.c lua.h luaconf.h fix32.h llimits.h lmem.h lstate.h \
  lobject.h ltm.h lzio.h
+eris.o: eris.c lua.h luaconf.h lauxlib.h lualib.h ldebug.h lstate.h \
+ lobject.h llimits.h ltm.h lzio.h lmem.h ldo.h lfunc.h lstring.h lgc.h \
+ eris.h
 
 # (end of Makefile)
