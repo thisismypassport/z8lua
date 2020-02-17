@@ -1,7 +1,7 @@
 //
 //  ZEPTO-8 — Fantasy console emulator
 //
-//  Copyright © 2016—2019 Sam Hocevar <sam@hocevar.net>
+//  Copyright © 2016—2020 Sam Hocevar <sam@hocevar.net>
 //
 //  This program is free software. It comes without any warranty, to
 //  the extent permitted by applicable law. You can redistribute it
@@ -86,29 +86,30 @@ struct fix32
     inline int32_t bits() const { return m_bits; }
 
     /* Comparisons */
-    bool operator ==(fix32 x) const { return m_bits == x.m_bits; }
-    bool operator !=(fix32 x) const { return m_bits != x.m_bits; }
-    bool operator  <(fix32 x) const { return m_bits  < x.m_bits; }
-    bool operator  >(fix32 x) const { return m_bits  > x.m_bits; }
-    bool operator <=(fix32 x) const { return m_bits <= x.m_bits; }
-    bool operator >=(fix32 x) const { return m_bits >= x.m_bits; }
+    inline operator bool() const { return bool(m_bits); }
+    inline bool operator ==(fix32 x) const { return m_bits == x.m_bits; }
+    inline bool operator !=(fix32 x) const { return m_bits != x.m_bits; }
+    inline bool operator  <(fix32 x) const { return m_bits  < x.m_bits; }
+    inline bool operator  >(fix32 x) const { return m_bits  > x.m_bits; }
+    inline bool operator <=(fix32 x) const { return m_bits <= x.m_bits; }
+    inline bool operator >=(fix32 x) const { return m_bits >= x.m_bits; }
 
     /* Increments */
-    fix32& operator ++() { m_bits += 0x10000; return *this; }
-    fix32& operator --() { m_bits -= 0x10000; return *this; }
-    fix32 operator ++(int) { fix32 ret = *this; ++*this; return ret; }
-    fix32 operator --(int) { fix32 ret = *this; --*this; return ret; }
+    inline fix32& operator ++() { m_bits += 0x10000; return *this; }
+    inline fix32& operator --() { m_bits -= 0x10000; return *this; }
+    inline fix32 operator ++(int) { fix32 ret = *this; ++*this; return ret; }
+    inline fix32 operator --(int) { fix32 ret = *this; --*this; return ret; }
 
     /* Math operations */
-    fix32 const &operator +() const { return *this; }
-    fix32 operator -() const { return frombits(-m_bits); }
-    fix32 operator ~() const { return frombits(~m_bits); }
+    inline fix32 const &operator +() const { return *this; }
+    inline fix32 operator -() const { return frombits(-m_bits); }
+    inline fix32 operator ~() const { return frombits(~m_bits); }
 
-    fix32 operator +(fix32 x) const { return frombits(m_bits + x.m_bits); }
-    fix32 operator -(fix32 x) const { return frombits(m_bits - x.m_bits); }
-    fix32 operator &(fix32 x) const { return frombits(m_bits & x.m_bits); }
-    fix32 operator |(fix32 x) const { return frombits(m_bits | x.m_bits); }
-    fix32 operator ^(fix32 x) const { return frombits(m_bits ^ x.m_bits); }
+    inline fix32 operator +(fix32 x) const { return frombits(m_bits + x.m_bits); }
+    inline fix32 operator -(fix32 x) const { return frombits(m_bits - x.m_bits); }
+    inline fix32 operator &(fix32 x) const { return frombits(m_bits & x.m_bits); }
+    inline fix32 operator |(fix32 x) const { return frombits(m_bits | x.m_bits); }
+    inline fix32 operator ^(fix32 x) const { return frombits(m_bits ^ x.m_bits); }
 
     fix32 operator *(fix32 x) const
     {
@@ -132,12 +133,12 @@ struct fix32
     inline fix32& operator /=(fix32 x) { return *this = *this / x; }
 
     /* Free functions */
-    static fix32 abs(fix32 a) { return a.m_bits > 0 ? a : -a; }
-    static fix32 min(fix32 a, fix32 b) { return a < b ? a : b; }
-    static fix32 max(fix32 a, fix32 b) { return a > b ? a : b; }
+    static inline fix32 abs(fix32 a) { return a.m_bits > 0 ? a : -a; }
+    static inline fix32 min(fix32 a, fix32 b) { return a < b ? a : b; }
+    static inline fix32 max(fix32 a, fix32 b) { return a > b ? a : b; }
 
-    static fix32 ceil(fix32 x) { return -floor(-x); }
-    static fix32 floor(fix32 x) { return frombits(x.m_bits & 0xffff0000); }
+    static inline fix32 ceil(fix32 x) { return -floor(-x); }
+    static inline fix32 floor(fix32 x) { return frombits(x.m_bits & 0xffff0000); }
 
     static fix32 pow(fix32 x, fix32 y) { return fix32(std::pow((double)x, (double)y)); }
 
