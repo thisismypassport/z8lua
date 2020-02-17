@@ -281,7 +281,6 @@ LUA_API lua_State *lua_newstate (lua_Alloc f, void *ud) {
   g->ud = ud;
   g->mainthread = L;
   g->seed = makeseed(L);
-  g->prngseed1 = g->prngseed2 = g->seed;
   g->uvhead.u.l.prev = &g->uvhead;
   g->uvhead.u.l.next = &g->uvhead;
   g->gcrunning = 0;  /* no GC while building state */

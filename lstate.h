@@ -119,7 +119,6 @@ typedef struct global_State {
   stringtable strt;  /* hash table for strings */
   TValue l_registry;
   unsigned int seed;  /* randomized seed for hashes */
-  uint32_t prngseed1, prngseed2;  /* randomized seed for PRNG */
   lu_byte currentwhite;
   lu_byte gcstate;  /* state of garbage collector */
   lu_byte gckind;  /* kind of GC running */
