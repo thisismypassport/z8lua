@@ -38,8 +38,8 @@ static const char *const luaX_tokens [] = {
     "end", "false", "for", "function", "goto", "if",
     "in", "local", "nil", "not", "or", "repeat",
     "return", "then", "true", "until", "while",
-    "..", "...", "==", ">=", "<=", "~=", "!=",
-    "+=", "-=", "*=", "/=", "%=", "::", "<eof>",
+    "..", "..=", "...", "==", ">=", "<=", "~=", "!=",
+    "+=", "-=", "*=", "/=", "%=", "^=", "::", "<eof>",
     "<number>", "<name>", "<string>", "?", "<eol>"
 };
 
@@ -503,11 +503,13 @@ static int llex (LexState *ls, SemInfo *seminfo) {
         read_string(ls, ls->current, seminfo);
         return TK_STRING;
       }
-      case '.': {  /* '.', '..', '...', or number */
+      case '.': {  /* '.', '..', '..=', '...', or number */
         save_and_next(ls);
         if (check_next(ls, ".")) {
           if (check_next(ls, "."))
             return TK_DOTS;   /* '...' */
+          else if (check_next(ls, "="))
+            return TK_CONCATE;   /* '..=' */
           else return TK_CONCAT;   /* '..' */
         }
         else if (!lisdigit(ls->current)) return '.';

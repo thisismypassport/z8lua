@@ -1171,12 +1171,14 @@ static void compound (LexState *ls, expdesc *v) {
   int i, line, extra;
   FuncState *fs = ls->fs;
   expdesc e1 = *v, e2;
-  /* compound -> ( `+=' | `-=' | `*=' | `/=' | `%=' ) expression */
+  /* compound -> ( `+=' | `-=' | `*=' | `/=' | `%=' | `^=' | `..=' ) expression */
   BinOpr op = ls->t.token == TK_ADDE ? OPR_ADD :
               ls->t.token == TK_SUBE ? OPR_SUB :
               ls->t.token == TK_MULE ? OPR_MUL :
               ls->t.token == TK_DIVE ? OPR_DIV :
               ls->t.token == TK_MODE ? OPR_MOD :
+              ls->t.token == TK_POWE ? OPR_POW :
+              ls->t.token == TK_CONCATE ? OPR_CONCAT :
               OPR_NOBINOPR;
   extra = fs->freereg - fs->nactvar;
   for (i = 0; i < extra; ++i)
@@ -1532,7 +1534,8 @@ static void exprstat (LexState *ls) {
   suffixedexp(ls, &v.v);
   if (ls->t.token == TK_ADDE || ls->t.token == TK_SUBE ||
         ls->t.token == TK_MULE || ls->t.token == TK_DIVE ||
-        ls->t.token == TK_MODE) {
+        ls->t.token == TK_MODE || ls->t.token == TK_POWE ||
+        ls->t.token == TK_CONCATE) {
     v.prev = NULL;
     compound(ls, &v.v);
   }
