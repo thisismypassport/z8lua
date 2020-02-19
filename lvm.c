@@ -768,6 +768,9 @@ void luaV_execute (lua_State *L) {
         lua_Number step = nvalue(ra+2);
         lua_Number idx = luai_numadd(L, (lua_Number)nvalue(ra), step); /* increment index */
         lua_Number limit = nvalue(ra+1);
+        /* check for idx sign wrap-around */
+        if (luai_numlt(L, 0, step) ? luai_numle(L, nvalue(ra), idx)
+                                   : luai_numle(L, idx, nvalue(ra)))
         if (luai_numlt(L, 0, step) ? luai_numle(L, idx, limit)
                                    : luai_numle(L, limit, idx)) {
           ci->u.l.savedpc += GETARG_sBx(i);  /* jump back */
