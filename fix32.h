@@ -118,10 +118,15 @@ struct fix32
 
     fix32 operator /(fix32 x) const
     {
-        /* XXX: PICO-8 returns 0x8000.0001 instead of 0x8000.0000 */
-        if (x.m_bits == 0)
-            return frombits(m_bits >= 0 ? 0x7fffffff : 0x80000001);
-        return frombits((int64_t)m_bits * 0x10000 / x.m_bits);
+        if (x.m_bits)
+        {
+            auto result = (int64_t)m_bits * 0x10000 / x.m_bits;
+            if (-result < 0x80000001u && result <= 0x7fffffffu)
+                return frombits(result);
+        }
+
+        // XXX: PICO-8 returns 0x8000.0001 instead of 0x8000.0000
+        return frombits((m_bits ^ x.m_bits) >= 0 ? 0x7fffffffu : 0x80000001u);
     }
 
     inline fix32& operator +=(fix32 x) { return *this = *this + x; }
