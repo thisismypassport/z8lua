@@ -120,9 +120,9 @@ struct fix32
     {
         if (x.m_bits)
         {
-            auto result = (int64_t)m_bits * 0x10000 / x.m_bits;
+            int64_t result = (int64_t)m_bits * 0x10000 / x.m_bits;
             if (-result < 0x80000001u && result <= 0x7fffffffu)
-                return frombits(result);
+                return frombits((int32_t)result);
         }
 
         // XXX: PICO-8 returns 0x8000.0001 instead of 0x8000.0000
