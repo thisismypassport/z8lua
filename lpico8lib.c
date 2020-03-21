@@ -156,11 +156,12 @@ static int pico8_rotr(lua_State *l) {
 static int pico8_tostr(lua_State *l) {
     char buffer[20];
     char const *s = buffer;
+    auto hex = lua_toboolean(l, 2);
     switch (lua_type(l, 1))
     {
         case LUA_TNUMBER: {
             lua_Number x = lua_tonumber(l, 1);
-            if (lua_toboolean(l, 2)) {
+            if (hex) {
                 uint32_t b = (uint32_t)x.bits();
                 sprintf(buffer, "0x%04x.%04x", (b >> 16) & 0xffff, b & 0xffff);
             } else {
@@ -170,6 +171,15 @@ static int pico8_tostr(lua_State *l) {
         }
         case LUA_TSTRING: s = lua_tostring(l, 1); break;
         case LUA_TBOOLEAN: s = lua_toboolean(l, 1) ? "true" : "false"; break;
+        // PICO-8 0.1.12d changelog: “tostr(x,true) can also be used to view
+        // the hex value of functions and tables (uses Lua's tostring)”
+        case LUA_TTABLE:
+        case LUA_TFUNCTION:
+            if (hex) {
+                luaL_tolstring(l, 1, NULL);
+                return 1;
+            }
+            [[fallthrough]];
         default: sprintf(buffer, "[%s]", luaL_typename(l, 1)); break;
     }
     lua_pushstring(l, s);
