@@ -171,10 +171,17 @@ static int pico8_tostr(lua_State *l) {
         }
         case LUA_TSTRING: s = lua_tostring(l, 1); break;
         case LUA_TBOOLEAN: s = lua_toboolean(l, 1) ? "true" : "false"; break;
-        // PICO-8 0.1.12d changelog: “tostr(x,true) can also be used to view
-        // the hex value of functions and tables (uses Lua's tostring)”
         case LUA_TTABLE:
+            // PICO-8 0.1.12d changelog: “__tostring metatable method
+            // observed by tostr() / print() / printh()”
+            if (luaL_callmeta(l, 1, "__tostring")) {
+                luaL_tolstring(l, 1, NULL);
+                return 1;
+            }
+            [[fallthrough]];
         case LUA_TFUNCTION:
+            // PICO-8 0.1.12d changelog: “tostr(x,true) can also be used to view
+            // the hex value of functions and tables (uses Lua's tostring)”
             if (hex) {
                 luaL_tolstring(l, 1, NULL);
                 return 1;
