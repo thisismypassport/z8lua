@@ -798,7 +798,9 @@ void luaK_infix (FuncState *fs, BinOpr op, expdesc *v) {
       break;
     }
     case OPR_ADD: case OPR_SUB: case OPR_MUL: case OPR_DIV:
-    case OPR_MOD: case OPR_POW: {
+    case OPR_MOD: case OPR_POW: case OPR_IDIV: case OPR_BAND:
+    case OPR_BOR: case OPR_BXOR: case OPR_SHL: case OPR_SHR:
+    case OPR_LSHR: {
       if (!isnumeral(v)) luaK_exp2RK(fs, v);
       break;
     }
@@ -842,7 +844,9 @@ void luaK_posfix (FuncState *fs, BinOpr op,
       break;
     }
     case OPR_ADD: case OPR_SUB: case OPR_MUL: case OPR_DIV:
-    case OPR_MOD: case OPR_POW: {
+    case OPR_MOD: case OPR_POW: case OPR_IDIV: case OPR_BAND:
+    case OPR_BOR: case OPR_BXOR: case OPR_SHL: case OPR_SHR:
+    case OPR_LSHR: {
       codearith(fs, cast(OpCode, op - OPR_ADD + OP_ADD), e1, e2, line);
       break;
     }

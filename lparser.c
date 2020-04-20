@@ -1021,14 +1021,15 @@ static const struct {
   lu_byte left;  /* left priority for each binary operator */
   lu_byte right; /* right priority */
 } priority[] = {  /* ORDER OPR */
-   {6, 6}, {6, 6}, {7, 7}, {7, 7}, {7, 7},  /* `+' `-' `*' `/' `%' */
+   {7, 7}, {7, 7}, {8, 8}, {8, 8}, {8, 8}, {8, 8},  /* `+' `-' `*' `/' `%' `\' */
+   {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6}, {6, 6},  /* `&' `|' `^^' `<<' `>>' `>>>' */
    {10, 9}, {5, 4},                 /* ^, .. (right associative) */
    {3, 3}, {3, 3}, {3, 3},          /* ==, <, <= */
    {3, 3}, {3, 3}, {3, 3},          /* ~=, >, >= */
    {2, 2}, {1, 1}                   /* and, or */
 };
 
-#define UNARY_PRIORITY	8  /* priority for unary operators */
+#define UNARY_PRIORITY	9  /* priority for unary operators */
 
 
 /*
