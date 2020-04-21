@@ -38,9 +38,11 @@ static const char *const luaX_tokens [] = {
     "end", "false", "for", "function", "goto", "if",
     "in", "local", "nil", "not", "or", "repeat",
     "return", "then", "true", "until", "while",
-    "..", "..=", "...", "==", ">=", "<=", "~=", "!=",
-    "+=", "-=", "*=", "/=", "%=", "^=", "::", "<eof>",
-    "<number>", "<name>", "<string>", "?", "<eol>"
+    "..", "...", "==", ">=", "<=", "~=", "!=", "::",
+    "<eof>", "<number>", "<name>", "<string>", "?",
+    "<eol>", "@@", "^^", "<<", ">>", ">>>",
+    "+=", "-=", "*=", "/=", "%=", "^=", "\\=",
+    "&=", "|=", "^^=", "<<=", ">>=", ">>>=", "..=",
 };
 
 
@@ -458,11 +460,26 @@ static int llex (LexState *ls, SemInfo *seminfo) {
           next(ls);  /* skip until end of line (or end of file) */
         break;
       }
-      case '+': case '*': case '%': {  /* '+', '*', '%' or '+=', '*=', '%=' */
+      case '+': case '*': case '%': case '&':
+      case '|': case '~': case '!': case '\\': {
+        /* '+', '*', '%', '\', '&', '|', '!', '~', and
+           the '+=' etc. counterparts */
         int c = ls->current;
         next(ls);
         if (ls->current != '=') return c;
-        else { next(ls); return c == '+' ? TK_ADDE : c == '*' ? TK_MULE : TK_MODE; }
+        else {
+          next(ls);
+          switch (c) {
+            case '+': return TK_ADDE;
+            case '*': return TK_MULE;
+            case '%': return TK_MODE;
+            case '&': return TK_BANDE;
+            case '|': return TK_BORE;
+            case '~': return TK_NE;
+            case '!': return TK_NE2;
+            case '\\': default: return TK_IDIVE;
+          }
+        }
       }
       case '[': {  /* long string or simply '[' */
         int sep = skip_sep(ls);
@@ -478,21 +495,37 @@ static int llex (LexState *ls, SemInfo *seminfo) {
         if (ls->current != '=') return '=';
         else { next(ls); return TK_EQ; }
       }
-      case '<': {
+      case '<': {  /* '<=' or '<' or '<<=' or '<<' */
         next(ls);
-        if (ls->current != '=') return '<';
-        else { next(ls); return TK_LE; }
+        if (ls->current == '=') { next(ls); return TK_LE; }
+        else if (ls->current != '<') return '<';
+        next(ls);
+        if (ls->current == '=') { next(ls); return TK_SHLE; }
+        else return TK_SHL;
       }
-      case '>': {
+      case '^': {  /* '^=' or '^' or '^^' or '^^=' */
         next(ls);
-        if (ls->current != '=') return '>';
-        else { next(ls); return TK_GE; }
+        if (ls->current == '=') { next(ls); return TK_POWE; }
+        else if (ls->current != '^') return '^';
+        next(ls);
+        if (ls->current == '=') { next(ls); return TK_BXORE; }
+        else return TK_BXOR;
       }
-      case '~': case '!': {
-        int c = ls->current;
+      case '>': {  /* '>=' or '>' or '>>=' or '>>' or '>>>=' or '>>>' */
         next(ls);
-        if (ls->current != '=') return c;
-        else { next(ls); return c == '~' ? TK_NE : TK_NE2; }
+        if (ls->current == '=') { next(ls); return TK_GE; }
+        else if (ls->current != '>') return '>';
+        next(ls);
+        if (ls->current == '=') { next(ls); return TK_SHRE; }
+        else if (ls->current != '>') return TK_SHR;
+        next(ls);
+        if (ls->current == '=') { next(ls); return TK_LSHRE; }
+        else return TK_LSHR;
+      }
+      case '@': {
+        next(ls);
+        if (ls->current != '@') return '@';
+        else { next(ls); return TK_DBAT; }
       }
       case ':': {
         next(ls);
