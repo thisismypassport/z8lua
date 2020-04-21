@@ -989,6 +989,7 @@ static UnOpr getunopr (int op) {
   switch (op) {
     case TK_NOT: return OPR_NOT;
     case '-': return OPR_MINUS;
+    case '~': return OPR_BNOT;
     case '#': return OPR_LEN;
     default: return OPR_NOUNOPR;
   }
@@ -1003,6 +1004,13 @@ static BinOpr getbinopr (int op) {
     case '/': return OPR_DIV;
     case '%': return OPR_MOD;
     case '^': return OPR_POW;
+    case '\\': return OPR_IDIV;
+    case '&': return OPR_BAND;
+    case '|': return OPR_BOR;
+    case TK_BXOR: return OPR_BXOR;
+    case TK_SHL: return OPR_SHL;
+    case TK_SHR: return OPR_SHR;
+    case TK_LSHR: return OPR_LSHR;
     case TK_CONCAT: return OPR_CONCAT;
     case TK_NE: case TK_NE2: return OPR_NE;
     case TK_EQ: return OPR_EQ;
@@ -1172,14 +1180,9 @@ static void compound (LexState *ls, expdesc *v) {
   int i, line, extra;
   FuncState *fs = ls->fs;
   expdesc e1 = *v, e2;
-  /* compound -> ( `+=' | `-=' | `*=' | `/=' | `%=' | `^=' | `..=' ) expression */
-  BinOpr op = ls->t.token == TK_ADDE ? OPR_ADD :
-              ls->t.token == TK_SUBE ? OPR_SUB :
-              ls->t.token == TK_MULE ? OPR_MUL :
-              ls->t.token == TK_DIVE ? OPR_DIV :
-              ls->t.token == TK_MODE ? OPR_MOD :
-              ls->t.token == TK_POWE ? OPR_POW :
-              ls->t.token == TK_CONCATE ? OPR_CONCAT :
+  /* compound -> ( `+=' | `-=' | `*=' | `/=' | etc. ) expression */
+  BinOpr op = ls->t.token >= TK_ADDE && ls->t.token <= TK_CONCATE ?
+              BinOpr(ls->t.token - TK_ADDE + OPR_ADD) :
               OPR_NOBINOPR;
   extra = fs->freereg - fs->nactvar;
   for (i = 0; i < extra; ++i)
@@ -1546,10 +1549,7 @@ static void exprstat (LexState *ls) {
   FuncState *fs = ls->fs;
   struct LHS_assign v;
   suffixedexp(ls, &v.v);
-  if (ls->t.token == TK_ADDE || ls->t.token == TK_SUBE ||
-        ls->t.token == TK_MULE || ls->t.token == TK_DIVE ||
-        ls->t.token == TK_MODE || ls->t.token == TK_POWE ||
-        ls->t.token == TK_CONCATE) {
+  if (ls->t.token >= TK_ADDE && ls->t.token <= TK_CONCATE) {
     v.prev = NULL;
     compound(ls, &v.v);
   }

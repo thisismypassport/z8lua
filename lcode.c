@@ -726,7 +726,8 @@ static void codearith (FuncState *fs, OpCode op,
   if (constfolding(op, e1, e2))
     return;
   else {
-    int o2 = (op != OP_UNM && op != OP_LEN) ? luaK_exp2RK(fs, e2) : 0;
+    int o2 = (op != OP_UNM && op != OP_BNOT && op != OP_LEN) ?
+             luaK_exp2RK(fs, e2) : 0;
     int o1 = luaK_exp2RK(fs, e1);
     if (o1 > o2) {
       freeexp(fs, e1);
@@ -769,6 +770,15 @@ void luaK_prefix (FuncState *fs, UnOpr op, expdesc *e, int line) {
       else {
         luaK_exp2anyreg(fs, e);
         codearith(fs, OP_UNM, e, &e2, line);
+      }
+      break;
+    }
+    case OPR_BNOT: {
+      if (isnumeral(e))  /* bnot constant? */
+        e->u.nval = luai_numbnot(NULL, e->u.nval);  /* fold it */
+      else {
+        luaK_exp2anyreg(fs, e);
+        codearith(fs, OP_BNOT, e, &e2, line);
       }
       break;
     }

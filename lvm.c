@@ -427,7 +427,9 @@ void luaV_finishOp (lua_State *L) {
   OpCode op = GET_OPCODE(inst);
   switch (op) {  /* finish its execution */
     case OP_ADD: case OP_SUB: case OP_MUL: case OP_DIV:
-    case OP_MOD: case OP_POW: case OP_UNM: case OP_LEN:
+    case OP_MOD: case OP_POW: case OP_IDIV: case OP_BAND:
+    case OP_BOR: case OP_BXOR: case OP_SHL: case OP_SHR:
+    case OP_LSHR: case OP_UNM: case OP_BNOT: case OP_LEN:
     case OP_GETTABUP: case OP_GETTABLE: case OP_SELF: {
       setobjs2s(L, base + GETARG_A(inst), --L->top);
       break;
@@ -632,6 +634,27 @@ void luaV_execute (lua_State *L) {
       vmcase(OP_POW,
         arith_op(luai_numpow, TM_POW);
       )
+      vmcase(OP_IDIV,
+        arith_op(luai_numidiv, TM_IDIV);
+      )
+      vmcase(OP_BAND,
+        arith_op(luai_numband, TM_BAND);
+      )
+      vmcase(OP_BOR,
+        arith_op(luai_numbor, TM_BOR);
+      )
+      vmcase(OP_BXOR,
+        arith_op(luai_numbxor, TM_BXOR);
+      )
+      vmcase(OP_SHL,
+        arith_op(luai_numshl, TM_SHL);
+      )
+      vmcase(OP_SHR,
+        arith_op(luai_numshr, TM_SHR);
+      )
+      vmcase(OP_LSHR,
+        arith_op(luai_numlshr, TM_LSHR);
+      )
       vmcase(OP_UNM,
         TValue *rb = RB(i);
         if (ttisnumber(rb)) {
@@ -640,6 +663,16 @@ void luaV_execute (lua_State *L) {
         }
         else {
           Protect(luaV_arith(L, ra, rb, rb, TM_UNM));
+        }
+      )
+      vmcase(OP_BNOT,
+        TValue *rb = RB(i);
+        if (ttisnumber(rb)) {
+          lua_Number nb = nvalue(rb);
+          setnvalue(ra, luai_numbnot(L, nb));
+        }
+        else {
+          Protect(luaV_arith(L, ra, rb, rb, TM_BNOT));
         }
       )
       vmcase(OP_NOT,
