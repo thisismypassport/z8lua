@@ -583,6 +583,9 @@
 #define luai_numshr(L,a,b)	((a)>>int((b)))
 #define luai_numlshr(L,a,b)	(l_mathop(lshr)((a),(b)))
 #define luai_numbnot(L,a)	(~(a))
+#define luai_numpeek(L,a)	((void)(a),0)
+#define luai_numpeek2(L,a)	((void)(a),0)
+#define luai_numpeek4(L,a)	((void)(a),0)
 
 #define lua_number2str(s,n) [&]() { \
   int i = sprintf(s, "%1.4f", (double)n); \

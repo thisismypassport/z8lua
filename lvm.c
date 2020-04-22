@@ -528,6 +528,13 @@ void luaV_finishOp (lua_State *L) {
         } \
         else { Protect(luaV_arith(L, ra, rb, rc, tm)); } }
 
+#define unary_op(op,tm) {\
+        TValue *rb = RB(i); \
+        if (ttisnumber(rb)) { \
+          lua_Number nb = nvalue(rb); \
+          setnvalue(ra, op(L, nb)); \
+        } \
+        else { Protect(luaV_arith(L, ra, rb, rb, tm)); } }
 
 #define vmdispatch(o)	switch(o)
 #define vmcase(l,b)	case l: {b}  break;
@@ -656,24 +663,19 @@ void luaV_execute (lua_State *L) {
         arith_op(luai_numlshr, TM_LSHR);
       )
       vmcase(OP_UNM,
-        TValue *rb = RB(i);
-        if (ttisnumber(rb)) {
-          lua_Number nb = nvalue(rb);
-          setnvalue(ra, luai_numunm(L, nb));
-        }
-        else {
-          Protect(luaV_arith(L, ra, rb, rb, TM_UNM));
-        }
+        unary_op(luai_numunm, TM_UNM);
       )
       vmcase(OP_BNOT,
-        TValue *rb = RB(i);
-        if (ttisnumber(rb)) {
-          lua_Number nb = nvalue(rb);
-          setnvalue(ra, luai_numbnot(L, nb));
-        }
-        else {
-          Protect(luaV_arith(L, ra, rb, rb, TM_BNOT));
-        }
+        unary_op(luai_numbnot, TM_BNOT);
+      )
+      vmcase(OP_PEEK,
+        unary_op(luai_numpeek, TM_PEEK);
+      )
+      vmcase(OP_PEEK2,
+        unary_op(luai_numpeek2, TM_PEEK2);
+      )
+      vmcase(OP_PEEK4,
+        unary_op(luai_numpeek4, TM_PEEK4);
       )
       vmcase(OP_NOT,
         TValue *rb = RB(i);

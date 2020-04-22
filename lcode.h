@@ -34,7 +34,10 @@ typedef enum BinOpr {
 } BinOpr;
 
 
-typedef enum UnOpr { OPR_MINUS, OPR_NOT, OPR_BNOT, OPR_LEN, OPR_NOUNOPR } UnOpr;
+typedef enum UnOpr {
+  OPR_MINUS, OPR_NOT, OPR_BNOT, OPR_PEEK, OPR_PEEK2, OPR_PEEK4, OPR_LEN,
+  OPR_NOUNOPR
+} UnOpr;
 
 
 #define getcode(fs,e)	((fs)->f->code[(e)->u.info])

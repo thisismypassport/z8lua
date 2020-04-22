@@ -201,6 +201,9 @@ OP_LSHR,/*	A B C	R(A) := RK(B) >>> RK(C)				*/
 OP_UNM,/*	A B	R(A) := -R(B)					*/
 OP_BNOT,/*	A B	R(A) := ~R(B)					*/
 OP_NOT,/*	A B	R(A) := not R(B)				*/
+OP_PEEK,/*	A B	R(A) := @ R(B)					*/
+OP_PEEK2,/*	A B	R(A) := @@ R(B)					*/
+OP_PEEK4,/*	A B	R(A) := $ R(B)					*/
 OP_LEN,/*	A B	R(A) := length of R(B)				*/
 
 OP_CONCAT,/*	A B C	R(A) := R(B).. ... ..R(C)			*/

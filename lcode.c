@@ -782,6 +782,11 @@ void luaK_prefix (FuncState *fs, UnOpr op, expdesc *e, int line) {
       }
       break;
     }
+    case OPR_PEEK: case OPR_PEEK2: case OPR_PEEK4: {
+      luaK_exp2anyreg(fs, e);  /* cannot operate on constants */
+      codearith(fs, OpCode(op - OPR_PEEK + OP_PEEK), e, &e2, line);
+      break;
+    }
     case OPR_NOT: codenot(fs, e); break;
     case OPR_LEN: {
       luaK_exp2anyreg(fs, e);  /* cannot operate on constants */

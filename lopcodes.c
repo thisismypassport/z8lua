@@ -44,6 +44,9 @@ LUAI_DDEF const char *const luaP_opnames[NUM_OPCODES+1] = {
   "UNM",
   "BNOT",
   "NOT",
+  "PEEK",
+  "PEEK2",
+  "PEEK4",
   "LEN",
   "CONCAT",
   "JMP",
@@ -100,6 +103,9 @@ LUAI_DDEF const lu_byte luaP_opmodes[NUM_OPCODES] = {
  ,opmode(0, 1, OpArgR, OpArgN, iABC)		/* OP_UNM */
  ,opmode(0, 1, OpArgR, OpArgN, iABC)		/* OP_BNOT */
  ,opmode(0, 1, OpArgR, OpArgN, iABC)		/* OP_NOT */
+ ,opmode(0, 1, OpArgR, OpArgN, iABC)		/* OP_PEEK */
+ ,opmode(0, 1, OpArgR, OpArgN, iABC)		/* OP_PEEK2 */
+ ,opmode(0, 1, OpArgR, OpArgN, iABC)		/* OP_PEEK4 */
  ,opmode(0, 1, OpArgR, OpArgN, iABC)		/* OP_LEN */
  ,opmode(0, 1, OpArgR, OpArgR, iABC)		/* OP_CONCAT */
  ,opmode(0, 0, OpArgR, OpArgN, iAsBx)		/* OP_JMP */
