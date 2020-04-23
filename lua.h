@@ -187,7 +187,15 @@ LUA_API const void     *(lua_topointer) (lua_State *L, int idx);
 #define LUA_OPDIV	3
 #define LUA_OPMOD	4
 #define LUA_OPPOW	5
-#define LUA_OPUNM	6
+#define LUA_OPIDIV	6
+#define LUA_OPBAND	7
+#define LUA_OPBOR	8
+#define LUA_OPBXOR	9
+#define LUA_OPSHL	10
+#define LUA_OPSHR	11
+#define LUA_OPLSHR	12
+#define LUA_OPUNM	13
+#define LUA_OPBNOT	14
 
 LUA_API void  (lua_arith) (lua_State *L, int op);
 
@@ -244,6 +252,7 @@ LUA_API void  (lua_rawsetp) (lua_State *L, int idx, const void *p);
 LUA_API int   (lua_setmetatable) (lua_State *L, int objindex);
 LUA_API void  (lua_setuservalue) (lua_State *L, int idx);
 
+LUA_API void  (lua_setpico8memory) (lua_State *L, unsigned char const *p);
 
 /*
 ** 'load' and 'call' functions (load and run Lua code)

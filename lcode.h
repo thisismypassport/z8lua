@@ -24,7 +24,8 @@
 ** grep "ORDER OPR" if you change these enums  (ORDER OP)
 */
 typedef enum BinOpr {
-  OPR_ADD, OPR_SUB, OPR_MUL, OPR_DIV, OPR_MOD, OPR_POW,
+  OPR_ADD, OPR_SUB, OPR_MUL, OPR_DIV, OPR_MOD, OPR_POW, OPR_IDIV,
+  OPR_BAND, OPR_BOR, OPR_BXOR, OPR_SHL, OPR_SHR, OPR_LSHR,
   OPR_CONCAT,
   OPR_EQ, OPR_LT, OPR_LE,
   OPR_NE, OPR_GT, OPR_GE,
@@ -33,7 +34,10 @@ typedef enum BinOpr {
 } BinOpr;
 
 
-typedef enum UnOpr { OPR_MINUS, OPR_NOT, OPR_LEN, OPR_NOUNOPR } UnOpr;
+typedef enum UnOpr {
+  OPR_MINUS, OPR_NOT, OPR_BNOT, OPR_PEEK, OPR_PEEK2, OPR_PEEK4, OPR_LEN,
+  OPR_NOUNOPR
+} UnOpr;
 
 
 #define getcode(fs,e)	((fs)->f->code[(e)->u.info])

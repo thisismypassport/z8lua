@@ -114,42 +114,27 @@ static int pico8_bnot(lua_State *l) {
 }
 
 static int pico8_shl(lua_State *l) {
-    // If y is negative, it is interpreted modulo 32.
-    // If y is >= 32, result is always zero.
-    int32_t xbits = lua_tonumber(l, 1).bits();
-    int y = (int)lua_tonumber(l, 2);
-    lua_pushnumber(l, lua_Number::frombits(y >= 32 ? 0 : xbits << (y & 0x1f)));
+    lua_pushnumber(l, lua_tonumber(l, 1) << (int)lua_tonumber(l, 2));
     return 1;
 }
 
 static int pico8_lshr(lua_State *l) {
-    int32_t xbits = lua_tonumber(l, 1).bits();
-    int y = (int)lua_tonumber(l, 2);
-    lua_pushnumber(l, lua_Number::frombits(y >= 32 ? 0 : (uint32_t)xbits >> (y & 0x1f)));
+    lua_pushnumber(l, lua_Number::lshr(lua_tonumber(l, 1), (int)lua_tonumber(l, 2)));
     return 1;
 }
 
 static int pico8_shr(lua_State *l) {
-    // If y is negative, it is interpreted modulo 32.
-    // If y is >= 32, only the sign is preserved, so it's
-    // the same as for y == 31.
-    int32_t xbits = lua_tonumber(l, 1).bits();
-    int y = (int)lua_tonumber(l, 2);
-    lua_pushnumber(l, lua_Number::frombits(xbits >> (std::min(y, 31) & 0x1f)));
+    lua_pushnumber(l, lua_tonumber(l, 1) >> (int)lua_tonumber(l, 2));
     return 1;
 }
 
 static int pico8_rotl(lua_State *l) {
-    int32_t xbits = lua_tonumber(l, 1).bits();
-    int y = 0x1f & (int)lua_tonumber(l, 2);
-    lua_pushnumber(l, lua_Number::frombits((xbits << y) | ((uint32_t)xbits >> (32 - y))));
+    lua_pushnumber(l, lua_Number::rotl(lua_tonumber(l, 1), (int)lua_tonumber(l, 2)));
     return 1;
 }
 
 static int pico8_rotr(lua_State *l) {
-    int32_t xbits = lua_tonumber(l, 1).bits();
-    int y = 0x1f & (int)lua_tonumber(l, 2);
-    lua_pushnumber(l, lua_Number::frombits(((uint32_t)xbits >> y) | (xbits << (32 - y))));
+    lua_pushnumber(l, lua_Number::rotr(lua_tonumber(l, 1), (int)lua_tonumber(l, 2)));
     return 1;
 }
 

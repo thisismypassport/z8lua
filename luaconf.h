@@ -575,6 +575,18 @@
 #define LUAI_UACNUMBER	z8::fix32
 #define l_mathop(x)	(z8::fix32::x)
 
+#define luai_numidiv(L,a,b)	(l_mathop(floor)((a)/(b)))
+#define luai_numband(L,a,b)	((a)&(b))
+#define luai_numbor(L,a,b)	((a)|(b))
+#define luai_numbxor(L,a,b)	((a)^(b))
+#define luai_numshl(L,a,b)	((a)<<int((b)))
+#define luai_numshr(L,a,b)	((a)>>int((b)))
+#define luai_numlshr(L,a,b)	(l_mathop(lshr)((a),(b)))
+#define luai_numbnot(L,a)	(~(a))
+#define luai_numpeek(L,a)	(lua_peek(L,a,1))
+#define luai_numpeek2(L,a)	(lua_peek(L,a,2))
+#define luai_numpeek4(L,a)	(lua_peek(L,a,4))
+
 #define lua_number2str(s,n) [&]() { \
   int i = sprintf(s, "%1.4f", (double)n); \
   while (i > 0 && s[i - 1] == '0') s[--i] = '\0'; \

@@ -726,7 +726,8 @@ static void codearith (FuncState *fs, OpCode op,
   if (constfolding(op, e1, e2))
     return;
   else {
-    int o2 = (op != OP_UNM && op != OP_LEN) ? luaK_exp2RK(fs, e2) : 0;
+    int o2 = (op != OP_UNM && op != OP_BNOT && op != OP_LEN) ?
+             luaK_exp2RK(fs, e2) : 0;
     int o1 = luaK_exp2RK(fs, e1);
     if (o1 > o2) {
       freeexp(fs, e1);
@@ -772,6 +773,20 @@ void luaK_prefix (FuncState *fs, UnOpr op, expdesc *e, int line) {
       }
       break;
     }
+    case OPR_BNOT: {
+      if (isnumeral(e))  /* bnot constant? */
+        e->u.nval = luai_numbnot(NULL, e->u.nval);  /* fold it */
+      else {
+        luaK_exp2anyreg(fs, e);
+        codearith(fs, OP_BNOT, e, &e2, line);
+      }
+      break;
+    }
+    case OPR_PEEK: case OPR_PEEK2: case OPR_PEEK4: {
+      luaK_exp2anyreg(fs, e);  /* cannot operate on constants */
+      codearith(fs, OpCode(op - OPR_PEEK + OP_PEEK), e, &e2, line);
+      break;
+    }
     case OPR_NOT: codenot(fs, e); break;
     case OPR_LEN: {
       luaK_exp2anyreg(fs, e);  /* cannot operate on constants */
@@ -798,7 +813,9 @@ void luaK_infix (FuncState *fs, BinOpr op, expdesc *v) {
       break;
     }
     case OPR_ADD: case OPR_SUB: case OPR_MUL: case OPR_DIV:
-    case OPR_MOD: case OPR_POW: {
+    case OPR_MOD: case OPR_POW: case OPR_IDIV: case OPR_BAND:
+    case OPR_BOR: case OPR_BXOR: case OPR_SHL: case OPR_SHR:
+    case OPR_LSHR: {
       if (!isnumeral(v)) luaK_exp2RK(fs, v);
       break;
     }
@@ -842,7 +859,9 @@ void luaK_posfix (FuncState *fs, BinOpr op,
       break;
     }
     case OPR_ADD: case OPR_SUB: case OPR_MUL: case OPR_DIV:
-    case OPR_MOD: case OPR_POW: {
+    case OPR_MOD: case OPR_POW: case OPR_IDIV: case OPR_BAND:
+    case OPR_BOR: case OPR_BXOR: case OPR_SHL: case OPR_SHR:
+    case OPR_LSHR: {
       codearith(fs, cast(OpCode, op - OPR_ADD + OP_ADD), e1, e2, line);
       break;
     }

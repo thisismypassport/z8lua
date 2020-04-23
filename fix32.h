@@ -14,6 +14,7 @@
 
 #include <cstdint>
 #include <cmath>
+#include <algorithm>   // std::min
 #include <type_traits>
 
 namespace z8
@@ -131,6 +132,22 @@ struct fix32
         return frombits((m_bits ^ x.m_bits) >= 0 ? 0x7fffffffu : 0x80000001u);
     }
 
+    inline fix32 operator <<(int y) const
+    {
+        // If y is negative, it is interpreted modulo 32.
+        // If y is >= 32, result is always zero.
+        return frombits(y >= 32 ? 0 : bits() << (y & 0x1f));
+    }
+
+    inline fix32 operator >>(int y) const
+    {
+        // If y is negative, it is interpreted modulo 32.
+        // If y is >= 32, only the sign is preserved, so it's
+        // the same as for y == 31.
+        using std::min;
+        return frombits(bits() >> (min(y, 31) & 0x1f));
+    }
+
     inline fix32& operator +=(fix32 x) { return *this = *this + x; }
     inline fix32& operator -=(fix32 x) { return *this = *this - x; }
     inline fix32& operator &=(fix32 x) { return *this = *this & x; }
@@ -148,6 +165,23 @@ struct fix32
     static inline fix32 floor(fix32 x) { return frombits(x.m_bits & 0xffff0000); }
 
     static fix32 pow(fix32 x, fix32 y) { return fix32(std::pow(double(x), double(y))); }
+
+    static inline fix32 lshr(fix32 x, int y)
+    {
+        return frombits(y >= 32 ? 0 : (uint32_t)x.bits() >> (y & 0x1f));
+    }
+
+    static inline fix32 rotl(fix32 x, int y)
+    {
+        y &= 0x1f;
+        return frombits((x.bits() << y) | ((uint32_t)x.bits() >> (32 - y)));
+    }
+
+    static inline fix32 rotr(fix32 x, int y)
+    {
+        y &= 0x1f;
+        return frombits(((uint32_t)x.bits() >> y) | (x.bits() << (32 - y)));
+    }
 
 private:
     int32_t m_bits;
