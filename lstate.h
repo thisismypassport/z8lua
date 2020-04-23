@@ -140,6 +140,7 @@ typedef struct global_State {
   int gcmajorinc;  /* pause between major collections (only in gen. mode) */
   int gcstepmul;  /* GC `granularity' */
   lua_CFunction panic;  /* to be called in unprotected errors */
+  lu_byte const *pico8memory;  /* pointer to PICO-8 RAM */
   struct lua_State *mainthread;
   const lua_Number *version;  /* pointer to version number */
   TString *memerrmsg;  /* memory-error message */

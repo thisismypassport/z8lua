@@ -252,6 +252,7 @@ LUA_API void  (lua_rawsetp) (lua_State *L, int idx, const void *p);
 LUA_API int   (lua_setmetatable) (lua_State *L, int objindex);
 LUA_API void  (lua_setuservalue) (lua_State *L, int idx);
 
+LUA_API void  (lua_setpico8memory) (lua_State *L, unsigned char const *p);
 
 /*
 ** 'load' and 'call' functions (load and run Lua code)
