@@ -451,7 +451,8 @@ void luaV_finishOp (lua_State *L) {
     case OP_ADD: case OP_SUB: case OP_MUL: case OP_DIV:
     case OP_MOD: case OP_POW: case OP_IDIV: case OP_BAND:
     case OP_BOR: case OP_BXOR: case OP_SHL: case OP_SHR:
-    case OP_LSHR: case OP_UNM: case OP_BNOT: case OP_LEN:
+    case OP_LSHR: case OP_ROTL: case OP_ROTR:
+    case OP_UNM: case OP_BNOT: case OP_LEN:
     case OP_GETTABUP: case OP_GETTABLE: case OP_SELF: {
       setobjs2s(L, base + GETARG_A(inst), --L->top);
       break;
@@ -683,6 +684,12 @@ void luaV_execute (lua_State *L) {
       )
       vmcase(OP_LSHR,
         arith_op(luai_numlshr, TM_LSHR);
+      )
+      vmcase(OP_ROTL,
+        arith_op(luai_numrotl, TM_ROTL);
+      )
+      vmcase(OP_ROTR,
+        arith_op(luai_numrotr, TM_ROTR);
       )
       vmcase(OP_UNM,
         unary_op(luai_numunm, TM_UNM);
