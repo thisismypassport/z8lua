@@ -197,6 +197,8 @@ OP_BXOR,/*	A B C	R(A) := RK(B) ^^ RK(C)				*/
 OP_SHL,/*	A B C	R(A) := RK(B) << RK(C)				*/
 OP_SHR,/*	A B C	R(A) := RK(B) >> RK(C)				*/
 OP_LSHR,/*	A B C	R(A) := RK(B) >>> RK(C)				*/
+OP_ROTL,/*	A B C	R(A) := RK(B) <<> RK(C)				*/
+OP_ROTR,/*	A B C	R(A) := RK(B) >>< RK(C)				*/
 
 OP_UNM,/*	A B	R(A) := -R(B)					*/
 OP_BNOT,/*	A B	R(A) := ~R(B)					*/

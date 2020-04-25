@@ -40,9 +40,9 @@ static const char *const luaX_tokens [] = {
     "return", "then", "true", "until", "while",
     "..", "...", "==", ">=", "<=", "~=", "!=", "::",
     "<eof>", "<number>", "<name>", "<string>", "?",
-    "<eol>", "@@", "^^", "<<", ">>", ">>>",
-    "+=", "-=", "*=", "/=", "%=", "^=", "\\=",
-    "&=", "|=", "^^=", "<<=", ">>=", ">>>=", "..=",
+    "<eol>", "@@", "^^", "<<", ">>", ">>>", "<<>", ">><",
+    "+=", "-=", "*=", "/=", "%=", "^=", "\\=", "&=", "|=",
+    "^^=", "<<=", ">>=", ">>>=", "<<>=", ">><=", "..=",
 };
 
 
@@ -495,13 +495,16 @@ static int llex (LexState *ls, SemInfo *seminfo) {
         if (ls->current != '=') return '=';
         else { next(ls); return TK_EQ; }
       }
-      case '<': {  /* '<=' or '<' or '<<=' or '<<' */
+      case '<': {  /* '<=' or '<' or '<<=' or '<<' or '<<>=' or '<<>' */
         next(ls);
         if (ls->current == '=') { next(ls); return TK_LE; }
         else if (ls->current != '<') return '<';
         next(ls);
         if (ls->current == '=') { next(ls); return TK_SHLE; }
-        else return TK_SHL;
+        else if (ls->current != '>') return TK_SHL;
+        next(ls);
+        if (ls->current == '=') { next(ls); return TK_ROTLE; }
+        else return TK_ROTL;
       }
       case '^': {  /* '^=' or '^' or '^^' or '^^=' */
         next(ls);
@@ -511,12 +514,17 @@ static int llex (LexState *ls, SemInfo *seminfo) {
         if (ls->current == '=') { next(ls); return TK_BXORE; }
         else return TK_BXOR;
       }
-      case '>': {  /* '>=' or '>' or '>>=' or '>>' or '>>>=' or '>>>' */
+      case '>': {  /* '>=', '>', '>>=', '>><=', >><', '>>', '>>>=', or '>>>' */
         next(ls);
         if (ls->current == '=') { next(ls); return TK_GE; }
         else if (ls->current != '>') return '>';
         next(ls);
         if (ls->current == '=') { next(ls); return TK_SHRE; }
+        else if (ls->current == '<') {
+          next(ls);
+          if (ls->current == '=') { next(ls); return TK_ROTRE; }
+          else return TK_ROTR;
+        }
         else if (ls->current != '>') return TK_SHR;
         next(ls);
         if (ls->current == '=') { next(ls); return TK_LSHRE; }

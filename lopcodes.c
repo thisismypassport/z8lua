@@ -41,6 +41,8 @@ LUAI_DDEF const char *const luaP_opnames[NUM_OPCODES+1] = {
   "SHL",
   "SHR",
   "LSHR",
+  "ROTL",
+  "ROTR",
   "UNM",
   "BNOT",
   "NOT",
@@ -100,6 +102,8 @@ LUAI_DDEF const lu_byte luaP_opmodes[NUM_OPCODES] = {
  ,opmode(0, 1, OpArgK, OpArgK, iABC)		/* OP_SHL */
  ,opmode(0, 1, OpArgK, OpArgK, iABC)		/* OP_SHR */
  ,opmode(0, 1, OpArgK, OpArgK, iABC)		/* OP_LSHR */
+ ,opmode(0, 1, OpArgK, OpArgK, iABC)		/* OP_ROTL */
+ ,opmode(0, 1, OpArgK, OpArgK, iABC)		/* OP_ROTR */
  ,opmode(0, 1, OpArgR, OpArgN, iABC)		/* OP_UNM */
  ,opmode(0, 1, OpArgR, OpArgN, iABC)		/* OP_BNOT */
  ,opmode(0, 1, OpArgR, OpArgN, iABC)		/* OP_NOT */

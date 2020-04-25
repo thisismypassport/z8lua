@@ -194,8 +194,10 @@ LUA_API const void     *(lua_topointer) (lua_State *L, int idx);
 #define LUA_OPSHL	10
 #define LUA_OPSHR	11
 #define LUA_OPLSHR	12
-#define LUA_OPUNM	13
-#define LUA_OPBNOT	14
+#define LUA_OPROTL	13
+#define LUA_OPROTR	14
+#define LUA_OPUNM	15
+#define LUA_OPBNOT	16
 
 LUA_API void  (lua_arith) (lua_State *L, int op);
 
