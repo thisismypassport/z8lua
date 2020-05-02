@@ -132,6 +132,14 @@ struct fix32
         return frombits((m_bits ^ x.m_bits) >= 0 ? 0x7fffffffu : 0x80000001u);
     }
 
+    fix32 operator %(fix32 x) const
+    {
+        // PICO-8 always returns positive values
+        x = abs(x);
+        int32_t result = x ? m_bits % x.m_bits : m_bits;
+        return frombits(result >= 0 ? result : result + x.m_bits);
+    }
+
     inline fix32 operator <<(int y) const
     {
         // XXX: not exactly the same as the pico8_shl()
@@ -153,6 +161,7 @@ struct fix32
     inline fix32& operator ^=(fix32 x) { return *this = *this ^ x; }
     inline fix32& operator *=(fix32 x) { return *this = *this * x; }
     inline fix32& operator /=(fix32 x) { return *this = *this / x; }
+    inline fix32& operator %=(fix32 x) { return *this = *this / x; }
 
     // Free functions
     static inline fix32 abs(fix32 a) { return a.m_bits > 0 ? a : -a; }
