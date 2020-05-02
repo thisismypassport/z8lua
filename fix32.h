@@ -116,7 +116,7 @@ struct fix32
 
     fix32 operator *(fix32 x) const
     {
-        return frombits(int64_t(m_bits) * x.m_bits / 0x10000);
+        return frombits(int64_t(m_bits) * x.m_bits >> 16);
     }
 
     fix32 operator /(fix32 x) const
