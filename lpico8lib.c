@@ -114,12 +114,20 @@ static int pico8_bnot(lua_State *l) {
 }
 
 static int pico8_shl(lua_State *l) {
-    lua_pushnumber(l, lua_tonumber(l, 1) << (int)lua_tonumber(l, 2));
+    // XXX: not exactly the same as fix32::operator<<
+    // If y is negative, it is interpreted modulo 32.
+    // If y is >= 32, result is always zero.
+    int32_t xbits = lua_tonumber(l, 1).bits();
+    int y = (int)lua_tonumber(l, 2);
+    lua_pushnumber(l, lua_Number::frombits(y >= 32 ? 0 : xbits << (y & 0x1f)));
     return 1;
 }
 
 static int pico8_lshr(lua_State *l) {
-    lua_pushnumber(l, lua_Number::lshr(lua_tonumber(l, 1), (int)lua_tonumber(l, 2)));
+    // XXX: not exactly the same as fix32::lshr
+    uint32_t xbits = uint32_t(lua_tonumber(l, 1).bits());
+    int y = int(lua_tonumber(l, 2));
+    lua_pushnumber(l, lua_Number::frombits(y >= 32 ? 0 : xbits >> (y & 0x1f)));
     return 1;
 }
 

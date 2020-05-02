@@ -134,16 +134,14 @@ struct fix32
 
     inline fix32 operator <<(int y) const
     {
-        // If y is negative, it is interpreted modulo 32.
-        // If y is >= 32, result is always zero.
-        return frombits(y >= 32 ? 0 : bits() << (y & 0x1f));
+        // XXX: not exactly the same as the pico8_shl()
+        return frombits(bits() << (y & 0x1f));
     }
 
     inline fix32 operator >>(int y) const
     {
-        // If y is negative, it is interpreted modulo 32.
-        // If y is >= 32, only the sign is preserved, so it's
-        // the same as for y == 31.
+        // If y is negative, it is interpreted modulo 32. If y is >= 32,
+        // only the sign is preserved, so it's the same as for y == 31.
         using std::min;
         return frombits(bits() >> (min(y, 31) & 0x1f));
     }
@@ -168,19 +166,20 @@ struct fix32
 
     static inline fix32 lshr(fix32 x, int y)
     {
-        return frombits(y >= 32 ? 0 : (uint32_t)x.bits() >> (y & 0x1f));
+        // XXX: not exactly the same as the pico8_lshr()
+        return frombits(uint32_t(x.bits()) >> (y & 0x1f));
     }
 
     static inline fix32 rotl(fix32 x, int y)
     {
         y &= 0x1f;
-        return frombits((x.bits() << y) | ((uint32_t)x.bits() >> (32 - y)));
+        return frombits((x.bits() << y) | (uint32_t(x.bits()) >> (32 - y)));
     }
 
     static inline fix32 rotr(fix32 x, int y)
     {
         y &= 0x1f;
-        return frombits(((uint32_t)x.bits() >> y) | (x.bits() << (32 - y)));
+        return frombits((uint32_t(x.bits()) >> y) | (x.bits() << (32 - y)));
     }
 
 private:
