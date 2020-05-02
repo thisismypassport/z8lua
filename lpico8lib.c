@@ -202,8 +202,17 @@ static int pico8_chr(lua_State *l) {
 }
 
 static int pico8_ord(lua_State *l) {
-    char const *s = lua_tostring(l, 1);
-    lua_pushnumber(l, *s ? (uint8_t)*s : 0);
+    size_t len;
+    int n = 0;
+    char const *s = luaL_checklstring(l, 1, &len);
+    if (!lua_isnone(l, 2)) {
+        if (!lua_isnumber(l, 2))
+            return 0;
+        n = int(lua_tonumber(l, 2)) - 1;
+    }
+    if (n < 0 || size_t(n) >= len)
+        return 0;
+    lua_pushnumber(l, uint8_t(s[n]));
     return 1;
 }
 
