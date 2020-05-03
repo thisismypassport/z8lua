@@ -114,12 +114,20 @@ static int pico8_bnot(lua_State *l) {
 }
 
 static int pico8_shl(lua_State *l) {
-    lua_pushnumber(l, lua_tonumber(l, 1) << (int)lua_tonumber(l, 2));
+    // XXX: not exactly the same as fix32::operator<<
+    // If y is negative, it is interpreted modulo 32.
+    // If y is >= 32, result is always zero.
+    int32_t xbits = lua_tonumber(l, 1).bits();
+    int y = (int)lua_tonumber(l, 2);
+    lua_pushnumber(l, lua_Number::frombits(y >= 32 ? 0 : xbits << (y & 0x1f)));
     return 1;
 }
 
 static int pico8_lshr(lua_State *l) {
-    lua_pushnumber(l, lua_Number::lshr(lua_tonumber(l, 1), (int)lua_tonumber(l, 2)));
+    // XXX: not exactly the same as fix32::lshr
+    uint32_t xbits = uint32_t(lua_tonumber(l, 1).bits());
+    int y = int(lua_tonumber(l, 2));
+    lua_pushnumber(l, lua_Number::frombits(y >= 32 ? 0 : xbits >> (y & 0x1f)));
     return 1;
 }
 
@@ -194,8 +202,17 @@ static int pico8_chr(lua_State *l) {
 }
 
 static int pico8_ord(lua_State *l) {
-    char const *s = lua_tostring(l, 1);
-    lua_pushnumber(l, *s ? (uint8_t)*s : 0);
+    size_t len;
+    int n = 0;
+    char const *s = luaL_checklstring(l, 1, &len);
+    if (!lua_isnone(l, 2)) {
+        if (!lua_isnumber(l, 2))
+            return 0;
+        n = int(lua_tonumber(l, 2)) - 1;
+    }
+    if (n < 0 || size_t(n) >= len)
+        return 0;
+    lua_pushnumber(l, uint8_t(s[n]));
     return 1;
 }
 

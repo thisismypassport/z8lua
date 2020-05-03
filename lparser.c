@@ -1036,18 +1036,20 @@ static const struct {
   lu_byte left;  /* left priority for each binary operator */
   lu_byte right; /* right priority */
 } priority[] = {  /* ORDER OPR */
-   {7, 7}, {7, 7}, {8, 8}, {8, 8}, {8, 8},  /* `+' `-' `*' `/' `%' */
-   {10, 9},                         /* ^ (right associative) */
-   {8, 8},                          /* `\' */
-   {6, 6}, {6, 6}, {6, 6}, {6, 6},  /* `&' `|' `^^' `<<' */
-   {6, 6}, {6, 6}, {6, 6}, {6, 6},  /*`>>' `>>>' `<<>' `>><' */
-   {5, 4},                          /* .. (right associative) */
-   {3, 3}, {3, 3}, {3, 3},          /* ==, <, <= */
-   {3, 3}, {3, 3}, {3, 3},          /* ~=, >, >= */
-   {2, 2}, {1, 1}                   /* and, or */
+   {10, 10}, {10, 10},           /* `+' `-' */
+   {11, 11}, {11, 11}, {11, 11}, /* `*' `/' `%' */
+   {13, 12},                     /* ^ (right associative) */
+   {11, 11},                     /* `\' */
+   {8, 8}, {6, 6}, {7, 7},       /* `&' `|' `^^' */
+   {9, 9}, {9, 9}, {9, 9},       /* `<<' `>>' `>>>' */
+   {9, 9}, {9, 9},               /* `<<>' `>><' */
+   {5, 4},                       /* .. (right associative) */
+   {3, 3}, {3, 3}, {3, 3},       /* ==, <, <= */
+   {3, 3}, {3, 3}, {3, 3},       /* ~=, >, >= */
+   {2, 2}, {1, 1}                /* and, or */
 };
 
-#define UNARY_PRIORITY	9  /* priority for unary operators */
+#define UNARY_PRIORITY	12  /* priority for unary operators */
 
 
 /*

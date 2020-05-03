@@ -433,7 +433,7 @@
 /* the following operations need the math library */
 #if defined(lobject_c) || defined(lvm_c)
 #include <math.h>
-#define luai_nummod(L,a,b)	((a) - l_mathop(floor)((a)/(b))*(b))
+#define luai_nummod(L,a,b)	((a)%(b))
 #define luai_numpow(L,a,b)	(l_mathop(pow)(a,b))
 #endif
 
@@ -581,9 +581,9 @@
 #define luai_numbxor(L,a,b)	((a)^(b))
 #define luai_numshl(L,a,b)	((a)<<int((b)))
 #define luai_numshr(L,a,b)	((a)>>int((b)))
-#define luai_numlshr(L,a,b)	(l_mathop(lshr)((a),(b)))
-#define luai_numrotl(L,a,b)	(l_mathop(rotl)((a),(b)))
-#define luai_numrotr(L,a,b)	(l_mathop(rotr)((a),(b)))
+#define luai_numlshr(L,a,b)	(l_mathop(lshr)((a),int((b))))
+#define luai_numrotl(L,a,b)	(l_mathop(rotl)((a),int((b))))
+#define luai_numrotr(L,a,b)	(l_mathop(rotr)((a),int((b))))
 #define luai_numbnot(L,a)	(~(a))
 #define luai_numpeek(L,a)	(lua_peek(L,a,1))
 #define luai_numpeek2(L,a)	(lua_peek(L,a,2))
