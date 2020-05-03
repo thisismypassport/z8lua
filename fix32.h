@@ -13,7 +13,7 @@
 #pragma once
 
 #include <cstdint>
-#include <cmath>
+#include <cmath>       // std::abs
 #include <algorithm>   // std::min
 #include <type_traits>
 
@@ -121,10 +121,15 @@ struct fix32
 
     fix32 operator /(fix32 x) const
     {
+        // This special case ensures 0x8000/0x1 = 0x8000, not 0x8000.0001
+        if (x.m_bits == 0x10000)
+            return *this;
+
         if (x.m_bits)
         {
+            using std::abs;
             int64_t result = int64_t(m_bits) * 0x10000 / x.m_bits;
-            if (-result < 0x80000001u && result <= 0x7fffffffu)
+            if (abs(result) <= 0x7fffffffu)
                 return frombits(int32_t(result));
         }
 
