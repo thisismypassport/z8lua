@@ -991,7 +991,7 @@ static UnOpr getunopr (int op) {
     case '-': return OPR_MINUS;
     case '~': return OPR_BNOT;
     case '@': return OPR_PEEK;
-    case TK_DBAT: return OPR_PEEK2;
+    case '%': return OPR_PEEK2;
     case '$': return OPR_PEEK4;
     case '#': return OPR_LEN;
     default: return OPR_NOUNOPR;

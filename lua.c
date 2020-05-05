@@ -484,9 +484,6 @@ int main (int argc, char **argv) {
     l_message(argv[0], "cannot create state: not enough memory");
     return EXIT_FAILURE;
   }
-unsigned char ram[65536];
-for (int i = 0; i < 65536; ++i) ram[i] = i %256;
-lua_setpico8memory(L, ram);
   /* call 'pmain' in protected mode */
   lua_pushcfunction(L, &pmain);
   lua_pushinteger(L, argc);  /* 1st argument */
