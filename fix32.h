@@ -147,16 +147,15 @@ struct fix32
 
     inline fix32 operator <<(int y) const
     {
-        // XXX: not exactly the same as the pico8_shl()
-        return frombits(bits() << (y & 0x1f));
+        // If y is negative, use lshr() instead.
+        return y < 0 ? lshr(*this, -y) : frombits(y >= 32 ? 0 : bits() << y);
     }
 
     inline fix32 operator >>(int y) const
     {
-        // If y is negative, it is interpreted modulo 32. If y is >= 32,
-        // only the sign is preserved, so it's the same as for y == 31.
         using std::min;
-        return frombits(bits() >> (min(y, 31) & 0x1f));
+        // If y is negative, use << instead.
+        return y < 0 ? *this << -y : frombits(bits() >> min(y, 31));
     }
 
     inline fix32& operator +=(fix32 x) { return *this = *this + x; }
@@ -180,8 +179,8 @@ struct fix32
 
     static inline fix32 lshr(fix32 x, int y)
     {
-        // XXX: not exactly the same as the pico8_lshr()
-        return frombits(uint32_t(x.bits()) >> (y & 0x1f));
+        // If y is negative, use << instead.
+        return y < 0 ? x << -y : frombits(uint32_t(x.bits()) >> (y % 32));
     }
 
     static inline fix32 rotl(fix32 x, int y)
