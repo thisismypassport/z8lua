@@ -993,7 +993,7 @@ static UnOpr getunopr (int op) {
     case '-': return OPR_MINUS;
     case '~': return OPR_BNOT;
     case '@': return OPR_PEEK;
-    case TK_DBAT: return OPR_PEEK2;
+    case '%': return OPR_PEEK2;
     case '$': return OPR_PEEK4;
     case '#': return OPR_LEN;
     default: return OPR_NOUNOPR;
@@ -1040,10 +1040,10 @@ static const struct {
    {11, 11}, {11, 11}, {11, 11}, /* `*' `/' `%' */
    {13, 12},                     /* ^ (right associative) */
    {11, 11},                     /* `\' */
-   {8, 8}, {6, 6}, {7, 7},       /* `&' `|' `^^' */
-   {9, 9}, {9, 9}, {9, 9},       /* `<<' `>>' `>>>' */
-   {9, 9}, {9, 9},               /* `<<>' `>><' */
-   {5, 4},                       /* .. (right associative) */
+   {6, 6}, {4, 4}, {5, 5},       /* `&' `|' `^^' */
+   {7, 7}, {7, 7}, {7, 7},       /* `<<' `>>' `>>>' */
+   {7, 7}, {7, 7},               /* `<<>' `>><' */
+   {9, 8},                       /* .. (right associative) */
    {3, 3}, {3, 3}, {3, 3},       /* ==, <, <= */
    {3, 3}, {3, 3}, {3, 3},       /* ~=, >, >= */
    {2, 2}, {1, 1}                /* and, or */
