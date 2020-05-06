@@ -180,7 +180,7 @@ struct fix32
     static inline fix32 lshr(fix32 x, int y)
     {
         // If y is negative, use << instead.
-        return y < 0 ? x << -y : frombits(uint32_t(x.bits()) >> (y % 32));
+        return y < 0 ? x << -y : frombits(y >= 32 ? 0 : uint32_t(x.bits()) >> y);
     }
 
     static inline fix32 rotl(fix32 x, int y)
