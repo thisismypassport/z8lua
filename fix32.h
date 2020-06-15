@@ -12,10 +12,10 @@
 
 #pragma once
 
-#include <cstdint>
+#include <stdint.h>    // int32_t, int64_t, …
 #include <cmath>       // std::abs
 #include <algorithm>   // std::min
-#include <type_traits>
+#include <type_traits> // std::enable_if
 
 namespace z8
 {
@@ -26,7 +26,7 @@ struct fix32
 
     // Convert from/to double
     inline fix32(double d)
-      : m_bits(int32_t(std::round(d * 65536.0)))
+      : m_bits(int32_t(int64_t(d * 65536.0)))
     {}
 
     inline operator double() const
