@@ -246,12 +246,13 @@ static void read_numeral (LexState *ls, SemInfo *seminfo) {
   int first = ls->current;
   lua_assert(lisdigit(ls->current));
   save_and_next(ls);
-  if (first == '0' && check_next(ls, "Xx"))  /* hexadecimal? */
+  bool hexa = first == '0' && check_next(ls, "Xx");  /* hexadecimal? */
+  if (hexa)
     expo = "Pp";
   for (;;) {
     if (check_next(ls, expo))  /* exponent part? */
       check_next(ls, "+-");  /* optional exponent sign */
-    if (lisxdigit(ls->current) || ls->current == '.')
+    if ((hexa ? lisxdigit(ls->current) : lisdigit(ls->current)) || ls->current == '.')
       save_and_next(ls);
     else  break;
   }
