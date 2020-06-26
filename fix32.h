@@ -34,19 +34,20 @@ struct fix32
         return double(m_bits) * (1.0 / 65536.0);
     }
 
-    // Conversions up to int16_t are safe
+    // Conversions up to int16_t are safe.
     inline fix32(int8_t x)  : m_bits(int32_t(x << 16)) {}
     inline fix32(uint8_t x) : m_bits(int32_t(x << 16)) {}
     inline fix32(int16_t x) : m_bits(int32_t(x << 16)) {}
 
     // Anything above int16_t is risky because of precision loss, but Lua
-    // does too many such implicit conversions that we can’t mark these as
-    // explicit.
-    inline fix32(uint16_t x) : m_bits(int32_t(x << 16)) {}
+    // does too many implicit conversions from int that we can’t mark this
+    // one as explicit.
     inline fix32(int32_t x)  : m_bits(int32_t(x << 16)) {}
-    inline fix32(uint32_t x) : m_bits(int32_t(x << 16)) {}
-    inline fix32(int64_t x)  : m_bits(int32_t(x << 16)) {}
-    inline fix32(uint64_t x) : m_bits(int32_t(x << 16)) {}
+
+    inline explicit fix32(uint16_t x) : m_bits(int32_t(x << 16)) {}
+    inline explicit fix32(uint32_t x) : m_bits(int32_t(x << 16)) {}
+    inline explicit fix32(int64_t x)  : m_bits(int32_t(x << 16)) {}
+    inline explicit fix32(uint64_t x) : m_bits(int32_t(x << 16)) {}
 
     // Support for long and unsigned long when it is a distinct
     // type from the standard int*_t types, e.g. on Windows.
@@ -57,7 +58,7 @@ struct fix32
                                      !std::is_same<T, uint32_t>::value &&
                                      !std::is_same<T, int64_t>::value &&
                                      !std::is_same<T, uint64_t>::value>::type *...>
-    inline fix32(T x) : m_bits(int32_t(x << 16)) {}
+    inline explicit fix32(T x) : m_bits(int32_t(x << 16)) {}
 
     // Explicit casts are all allowed
     inline explicit operator int8_t()   const { return m_bits >> 16; }
