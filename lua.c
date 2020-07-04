@@ -477,6 +477,9 @@ static int pmain (lua_State *L) {
 }
 
 
+static uint8_t ram[32768];
+
+
 int main (int argc, char **argv) {
   int status, result;
   lua_State *L = luaL_newstate();  /* create state */
@@ -484,6 +487,7 @@ int main (int argc, char **argv) {
     l_message(argv[0], "cannot create state: not enough memory");
     return EXIT_FAILURE;
   }
+  lua_setpico8memory(L, ram);
   /* call 'pmain' in protected mode */
   lua_pushcfunction(L, &pmain);
   lua_pushinteger(L, argc);  /* 1st argument */
