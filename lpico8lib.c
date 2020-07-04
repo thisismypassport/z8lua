@@ -78,7 +78,6 @@ static int pico8_atan2(lua_State *l) {
 
 static int pico8_sqrt(lua_State *l) {
     lua_Number x = lua_tonumber(l, 1);
-    /* FIXME PICO-8 actually returns stuff for negative values */
     lua_pushnumber(l, cast_num(x.bits() >= 0 ? std::sqrt((double)x) : 0));
     return 1;
 }
