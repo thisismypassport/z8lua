@@ -210,6 +210,34 @@ static int pico8_ord(lua_State *l) {
     return 1;
 }
 
+static int pico8_split(lua_State *l) {
+    size_t count = 0, hlen;
+    char const *haystack = luaL_checklstring(l, 1, &hlen);
+    if (!haystack)
+        return 0;
+    lua_newtable(l);
+    char needle = lua_isstring(l, 2) ? *lua_tostring(l, 2) : ',';
+    auto convert = lua_isnone(l, 3) || lua_toboolean(l, 3);
+    char const *end = haystack + hlen + !!needle;
+    for (char const *parser = haystack; parser < end; ) {
+        lua_Number num;
+        char const *next = needle ? strchr(parser, needle) : parser + 1;
+        if (!next)
+            next = haystack + hlen;
+        char save = *next; // temporarily put a null terminator here
+        *(char *)next = '\0';
+        if (convert && luaO_str2d(parser, next - parser, &num))
+            lua_pushnumber(l, num);
+        else
+            lua_pushstring(l, parser);
+        *(char *)next = save;
+        lua_rawseti(l, -2, ++count);
+        parser = next + !!needle;
+
+    }
+    return 1;
+}
+
 static const luaL_Reg pico8lib[] = {
   {"max",   pico8_max},
   {"min",   pico8_min},
@@ -235,6 +263,7 @@ static const luaL_Reg pico8lib[] = {
   {"tonum", pico8_tonum},
   {"chr",   pico8_chr},
   {"ord",   pico8_ord},
+  {"split", pico8_split},
   {NULL, NULL}
 };
 
