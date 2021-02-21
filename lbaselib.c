@@ -187,7 +187,9 @@ static int luaB_collectgarbage (lua_State *L) {
 
 
 static int luaB_type (lua_State *L) {
-  luaL_checkany(L, 1);
+  // PICO-8: type() returns nothing instead of causing a runtime error
+  if (lua_isnone(L, 1))
+    return 0;
   lua_pushstring(L, luaL_typename(L, 1));
   return 1;
 }
