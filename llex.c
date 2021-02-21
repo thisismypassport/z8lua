@@ -372,6 +372,12 @@ static void read_string (LexState *ls, int del, SemInfo *seminfo) {
         int c;  /* final character to be saved */
         next(ls);  /* do not save the `\' */
         switch (ls->current) {
+          case '*': c = '\1'; goto read_save;
+          case '#': c = '\2'; goto read_save;
+          case '-': c = '\3'; goto read_save;
+          case '|': c = '\4'; goto read_save;
+          case '+': c = '\5'; goto read_save;
+          case '^': c = '\6'; goto read_save;
           case 'a': c = '\a'; goto read_save;
           case 'b': c = '\b'; goto read_save;
           case 'f': c = '\f'; goto read_save;
