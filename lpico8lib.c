@@ -141,11 +141,12 @@ static int pico8_tostr(lua_State *l) {
     char buffer[20];
     char const *s = buffer;
     auto hex = lua_toboolean(l, 2);
-    // PICO-8 0.2.1 changelog: tostr() returns nil (used to return "[nil]")
-    if (lua_isnone(l, 1))
-        return 0;
     switch (lua_type(l, 1))
     {
+        case LUA_TNONE:
+            // PICO-8 0.2.2 changelog: tostr() returns "" instead of nil
+            buffer[0] = '\0';
+            break;
         case LUA_TNUMBER: {
             lua_Number x = lua_tonumber(l, 1);
             if (hex) {
