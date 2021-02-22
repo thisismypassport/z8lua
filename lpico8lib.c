@@ -217,24 +217,33 @@ static int pico8_split(lua_State *l) {
     if (!haystack)
         return 0;
     lua_newtable(l);
-    char needle = lua_isstring(l, 2) ? *lua_tostring(l, 2) : ',';
+    // Split either by chunk size or by needle position
+    int size = 0;
+    char needle = ',';
+    if (lua_isnumber(l, 2)) {
+        size = int(lua_tonumber(l, 2));
+        if (size <= 0)
+            size = 1;
+    } else if (lua_isstring(l, 2)) {
+        needle = *lua_tostring(l, 2);
+    }
     auto convert = lua_isnone(l, 3) || lua_toboolean(l, 3);
-    char const *end = haystack + hlen + !!needle;
+    char const *end = haystack + hlen + (!size && needle);
     for (char const *parser = haystack; parser < end; ) {
         lua_Number num;
-        char const *next = needle ? strchr(parser, needle) : parser + 1;
-        if (!next)
+        char const *next = size ? parser + size
+                         : needle ? strchr(parser, needle) : parser + 1;
+        if (!next || next > end)
             next = haystack + hlen;
-        char save = *next; // temporarily put a null terminator here
+        char saved = *next; // temporarily put a null terminator here
         *(char *)next = '\0';
         if (convert && luaO_str2d(parser, next - parser, &num))
             lua_pushnumber(l, num);
         else
             lua_pushstring(l, parser);
-        *(char *)next = save;
-        lua_rawseti(l, -2, ++count);
-        parser = next + !!needle;
-
+        *(char *)next = saved;
+        lua_rawseti(l, -2, int(++count));
+        parser = next + (!size && needle);
     }
     return 1;
 }
