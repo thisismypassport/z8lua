@@ -107,7 +107,7 @@ static int isneg (const char **s) {
 }
 
 
-#if !defined(lua_strx2number)
+#if false && !defined(lua_strx2number)
 
 #include <math.h>
 
