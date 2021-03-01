@@ -157,7 +157,9 @@ static int pico8_tostr(lua_State *l) {
             }
             break;
         }
-        case LUA_TSTRING: s = lua_tostring(l, 1); break;
+        case LUA_TSTRING:
+            lua_pushvalue(l, 1);
+            return 1;
         case LUA_TBOOLEAN: s = lua_toboolean(l, 1) ? "true" : "false"; break;
         case LUA_TTABLE:
             // PICO-8 0.1.12d changelog: “__tostring metatable method
@@ -192,7 +194,7 @@ static int pico8_tonum(lua_State *l) {
 
 static int pico8_chr(lua_State *l) {
     char s[2] = { (char)(uint8_t)lua_tonumber(l, 1), '\0' };
-    lua_pushstring(l, s);
+    lua_pushlstring(l, s, 1);
     return 1;
 }
 
