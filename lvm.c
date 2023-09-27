@@ -208,9 +208,9 @@ static int call_orderTM (lua_State *L, const TValue *p1, const TValue *p2,
 
 #define PEEK(ram, address) (ram && (address < 0x8000) ? ram[address] : 0)
 
-static z8::fix32 lua_peek(struct lua_State *L, z8::fix32 a, int count)
+z8::fix32 lua_peek(struct lua_State *L, z8::fix32 a, int count)
 {
-  unsigned char const *p = G(L)->pico8memory;
+  unsigned char *p = G(L)->pico8memory;
   int address = int(a) & 0x7fff;
   uint32_t ret = 0;
   switch (count) {
@@ -227,6 +227,25 @@ static z8::fix32 lua_peek(struct lua_State *L, z8::fix32 a, int count)
   return z8::fix32::frombits(ret);
 }
 
+#define POKE(ram, address, value) if (ram && (address < 0x8000)) ram[address] = value
+
+void lua_poke(struct lua_State *L, z8::fix32 a, z8::fix32 v, int count)
+{
+  unsigned char *p = G(L)->pico8memory;
+  int address = int(a) & 0x7fff;
+  uint32_t value = v.bits();
+  switch (count) {
+    case 4:
+      POKE(p, address + 1, value >> 8);
+      POKE(p, address, value);
+      address += 2;
+    case 2:
+      POKE(p, address + 1, value >> 24);
+    case 1:
+      POKE(p, address, value >> 16);
+      break;
+  }
+}
 
 static int l_strcmp (const TString *ls, const TString *rs) {
   const char *l = getstr(ls);
@@ -390,6 +409,23 @@ void luaV_arith (lua_State *L, StkId ra, const TValue *rb,
   }
   else if (!call_binTM(L, rb, rc, ra, op))
     luaG_aritherror(L, rb, rc);
+}
+
+void luaV_assign (lua_State *L, const TValue *ra,
+                  const TValue *rb, TMS op) {
+  TValue tempa, tempb;
+  const TValue *a, *b;
+  if ((a = luaV_tonumber(ra, &tempa)) != NULL &&
+      (b = luaV_tonumber(rb, &tempb)) != NULL) {
+    luaO_arith(op - TM_ADD + LUA_OPADD, nvalue(a), nvalue(b));
+  }
+  else
+  {
+    const TValue *tm = luaT_gettmbyobj(L, ra, op);  /* try first operand only */
+    if (ttisnil(tm)) luaG_aritherror(L, ra, rb);
+    callTM(L, tm, ra, rb, (TValue*) rb, 0); // benign cast due to !hasres:
+    // callTM will send an extra rb arg, not unlike how __unm receives an extra rb arg.
+  } 
 }
 
 
@@ -559,6 +595,15 @@ void luaV_finishOp (lua_State *L) {
         } \
         else { Protect(luaV_arith(L, ra, rb, rb, tm)); } }
 
+#define assign_op(op,tm) { \
+        TValue *ra = RA(i); \
+        TValue *rb = RB(i); \
+        if (ttisnumber(ra) && ttisnumber(rb)) { \
+          lua_Number na = nvalue(ra), nb = nvalue(rb); \
+          op(L, na, nb); \
+        } \
+        else { Protect(luaV_assign(L, ra, rb, tm)); } }
+
 #define vmdispatch(o)	switch(o)
 #define vmcase(l,b)	case l: {b}  break;
 #define vmcasenb(l,b)	case l: {b}		/* nb = no break */
@@ -705,6 +750,15 @@ void luaV_execute (lua_State *L) {
       )
       vmcase(OP_PEEK4,
         unary_op(luai_numpeek4, TM_PEEK4);
+      )
+      vmcase(OP_POKE,
+        assign_op(luai_numpoke, TM_POKE);
+      )
+      vmcase(OP_POKE2,
+        assign_op(luai_numpoke2, TM_POKE2);
+      )
+      vmcase(OP_POKE4,
+        assign_op(luai_numpoke4, TM_POKE4);
       )
       vmcase(OP_NOT,
         TValue *rb = RB(i);

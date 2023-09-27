@@ -17,6 +17,9 @@
 #include <algorithm>   // std::min
 #include <type_traits> // std::enable_if
 
+#undef min
+#undef max
+
 namespace z8
 {
 

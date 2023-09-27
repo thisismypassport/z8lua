@@ -876,6 +876,7 @@ static void funcargs (LexState *ls, expdesc *f, int line) {
 ** =======================================================================
 */
 
+static BinOpr subexpr(LexState *ls, expdesc *v, int limit);
 
 static void primaryexp (LexState *ls, expdesc *v) {
   /* primaryexp -> NAME | '(' expr ')' */
@@ -890,6 +891,10 @@ static void primaryexp (LexState *ls, expdesc *v) {
     }
     case TK_NAME: {
       singlevar(ls, v);
+      return;
+    }
+    case '@': case '%': case '$': {
+      subexpr(ls, v, 0);
       return;
     }
     default: {
@@ -1145,6 +1150,13 @@ static void check_conflict (LexState *ls, struct LHS_assign *lh, expdesc *v) {
         lh->v.u.ind.idx = extra;  /* previous assignment will use safe copy */
       }
     }
+    if (lh->v.k == VPEEKPOKE) { /* doing a poke? */
+      /* address is the local being assigned? */
+      if (v->k == VLOCAL && lh->v.u.pkpk.addr == v->u.info) {
+        conflict = 1;
+        lh->v.u.pkpk.addr = extra;  /* previous assignment will use safe copy */
+      }
+    }
   }
   if (conflict) {
     /* copy upvalue/local value to a temporary (in position 'extra') */
@@ -1162,7 +1174,7 @@ static void assignment (LexState *ls, struct LHS_assign *lh, int nvars) {
     struct LHS_assign nv;
     nv.prev = lh;
     suffixedexp(ls, &nv.v);
-    if (nv.v.k != VINDEXED)
+    if (nv.v.k != VINDEXED && nv.v.k != VPEEKPOKE)
       check_conflict(ls, lh, &nv.v);
     checklimit(ls->fs, nvars + ls->L->nCcalls, LUAI_MAXCCALLS,
                     "C levels");
@@ -1565,6 +1577,9 @@ static void exprstat (LexState *ls) {
   else if (ls->t.token == '=' || ls->t.token == ',') { /* stat -> assignment ? */
     v.prev = NULL;
     assignment(ls, &v, 1);
+  }
+  else if (v.v.k == VPEEKPOKE) {
+    luaX_syntaxerror(ls, "unexpected symbol");
   }
   else {  /* stat -> func */
     check_condition(ls, v.v.k == VCALL, "syntax error");

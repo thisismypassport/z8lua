@@ -134,7 +134,7 @@ LUA_API lua_CFunction lua_atpanic (lua_State *L, lua_CFunction panicf) {
 }
 
 
-LUA_API void lua_setpico8memory (lua_State *L, unsigned char const *p) {
+LUA_API void lua_setpico8memory (lua_State *L, unsigned char *p) {
   lua_lock(L);
   G(L)->pico8memory = p;
   lua_unlock(L);

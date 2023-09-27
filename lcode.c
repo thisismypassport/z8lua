@@ -402,6 +402,13 @@ void luaK_dischargevars (FuncState *fs, expdesc *e) {
       e->k = VRELOCABLE;
       break;
     }
+    case VPEEKPOKE: {
+      freereg(fs, e->u.pkpk.addr);
+      OpCode op = OpCode(e->u.pkpk.opr - OPR_PEEK + OP_PEEK);
+      e->u.info = luaK_codeABC(fs, op, 0, e->u.pkpk.addr, 0);
+      e->k = VRELOCABLE;
+      break;
+    }
     case VVARARG:
     case VCALL: {
       luaK_setoneret(fs, e);
@@ -573,6 +580,12 @@ void luaK_storevar (FuncState *fs, expdesc *var, expdesc *ex) {
       luaK_codeABC(fs, op, var->u.ind.t, var->u.ind.idx, e);
       break;
     }
+    case VPEEKPOKE: {
+      OpCode op = OpCode(var->u.pkpk.opr - OPR_PEEK + OP_POKE);
+      int e = luaK_exp2anyreg(fs, ex);
+      luaK_codeABC(fs, op, var->u.pkpk.addr, e, 0);
+      break;
+    }
     default: {
       lua_assert(0);  /* invalid var kind to store */
       break;
@@ -709,6 +722,13 @@ void luaK_indexed (FuncState *fs, expdesc *t, expdesc *k) {
   t->k = VINDEXED;
 }
 
+void luaK_peekpoke (FuncState *fs, expdesc *t, UnOpr opr) {
+  lua_assert(!hasjumps(t));
+  t->u.pkpk.addr = t->u.info;
+  t->u.pkpk.opr = opr;
+  t->k = VPEEKPOKE;
+}
+
 
 static int constfolding (OpCode op, expdesc *e1, expdesc *e2) {
   lua_Number r;
@@ -784,7 +804,7 @@ void luaK_prefix (FuncState *fs, UnOpr op, expdesc *e, int line) {
     }
     case OPR_PEEK: case OPR_PEEK2: case OPR_PEEK4: {
       luaK_exp2anyreg(fs, e);  /* cannot operate on constants */
-      codearith(fs, OpCode(op - OPR_PEEK + OP_PEEK), e, &e2, line);
+      luaK_peekpoke(fs, e, op);
       break;
     }
     case OPR_NOT: codenot(fs, e); break;

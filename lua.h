@@ -208,7 +208,6 @@ LUA_API void  (lua_arith) (lua_State *L, int op);
 LUA_API int   (lua_rawequal) (lua_State *L, int idx1, int idx2);
 LUA_API int   (lua_compare) (lua_State *L, int idx1, int idx2, int op);
 
-
 /*
 ** push functions (C -> stack)
 */
@@ -254,7 +253,7 @@ LUA_API void  (lua_rawsetp) (lua_State *L, int idx, const void *p);
 LUA_API int   (lua_setmetatable) (lua_State *L, int objindex);
 LUA_API void  (lua_setuservalue) (lua_State *L, int idx);
 
-LUA_API void  (lua_setpico8memory) (lua_State *L, unsigned char const *p);
+LUA_API void  (lua_setpico8memory) (lua_State *L, unsigned char *p);
 
 /*
 ** 'load' and 'call' functions (load and run Lua code)

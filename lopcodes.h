@@ -206,6 +206,9 @@ OP_NOT,/*	A B	R(A) := not R(B)				*/
 OP_PEEK,/*	A B	R(A) := @ R(B)					*/
 OP_PEEK2,/*	A B	R(A) := % R(B)					*/
 OP_PEEK4,/*	A B	R(A) := $ R(B)					*/
+OP_POKE,/*	A B	@ R(A) := R(B)					*/
+OP_POKE2,/*	A B	% R(A) := R(B)					*/
+OP_POKE4,/*	A B	$ R(A) := R(B)					*/
 OP_LEN,/*	A B	R(A) := length of R(B)				*/
 
 OP_CONCAT,/*	A B C	R(A) := R(B).. ... ..R(C)			*/

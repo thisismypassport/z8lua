@@ -588,6 +588,9 @@
 #define luai_numpeek(L,a)	(lua_peek(L,a,1))
 #define luai_numpeek2(L,a)	(lua_peek(L,a,2))
 #define luai_numpeek4(L,a)	(lua_peek(L,a,4))
+#define luai_numpoke(L,a,b)	(lua_poke(L,a,b,1))
+#define luai_numpoke2(L,a,b)	(lua_poke(L,a,b,2))
+#define luai_numpoke4(L,a,b)	(lua_poke(L,a,b,4))
 
 #define lua_number2str(s,n) [&]() { \
   int i = sprintf(s, "%1.4f", (double)n); \

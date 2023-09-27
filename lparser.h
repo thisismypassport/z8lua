@@ -27,6 +27,7 @@ typedef enum {
   VLOCAL,	/* info = local register */
   VUPVAL,       /* info = index of upvalue in 'upvalues' */
   VINDEXED,	/* t = table register/upvalue; idx = index R/K */
+  VPEEKPOKE,/* addr = address R; opr = OPR_PEEK* */
   VJMP,		/* info = instruction pc */
   VRELOCABLE,	/* info = instruction pc */
   VCALL,	/* info = instruction pc */
@@ -34,7 +35,7 @@ typedef enum {
 } expkind;
 
 
-#define vkisvar(k)	(VLOCAL <= (k) && (k) <= VINDEXED)
+#define vkisvar(k)	(VLOCAL <= (k) && (k) <= VPEEKPOKE)
 #define vkisinreg(k)	((k) == VNONRELOC || (k) == VLOCAL)
 
 typedef struct expdesc {
@@ -45,6 +46,10 @@ typedef struct expdesc {
       lu_byte t;  /* table (register or upvalue) */
       lu_byte vt;  /* whether 't' is register (VLOCAL) or upvalue (VUPVAL) */
     } ind;
+    struct {  /* for peeks/pokes (VPEEKPOKE) */
+      short addr;  /* address (R) */
+      short opr; /* peek opr (OPR_PEEK*) */
+    } pkpk;
     int info;  /* for generic use */
     lua_Number nval;  /* for VKNUM */
   } u;
