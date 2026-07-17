@@ -208,6 +208,7 @@ static int pico8_tostr(lua_State *l) {
             lua_pushvalue(l, 1);
             return 1;
         case LUA_TBOOLEAN: s = lua_toboolean(l, 1) ? "true" : "false"; break;
+        case LUA_TUSERDATA: // for non-standard use
         case LUA_TTABLE:
             // PICO-8 0.1.12d changelog: “__tostring metatable method
             // observed by tostr() / print() / printh()”
@@ -614,17 +615,6 @@ static int pico8_memset(lua_State *l) {
     return 0;
 }
 
-static int pico8_print(lua_State *l) {
-    // (for now?) ignoring print/printh extra args
-    lua_settop(l, 1);
-    pico8_tostr(l);
-    size_t len;
-    const char* s = lua_tolstring(l, -1, &len);
-    luai_writestring(s, len);
-    luai_writeline();
-    return 0;
-}
-
 extern int (*lua_baselib_assert) (lua_State *L);
 extern int (*lua_baselib_getmetatable) (lua_State *L);
 extern int (*lua_baselib_setmetatable) (lua_State *L);
@@ -632,7 +622,6 @@ extern int (*lua_baselib_ipairs) (lua_State *L);
 extern int (*lua_baselib_inext) (lua_State *L);
 extern int (*lua_baselib_next) (lua_State *L);
 extern int (*lua_baselib_pairs) (lua_State *L);
-extern int (*lua_baselib_print) (lua_State *L);
 extern int (*lua_baselib_rawequal) (lua_State *L);
 extern int (*lua_baselib_rawlen) (lua_State *L);
 extern int (*lua_baselib_rawget) (lua_State *L);
@@ -706,8 +695,6 @@ static const luaL_Reg pico8lib[] = {
   {"poke4", pico8_poke4},
   {"memcpy", pico8_memcpy},
   {"memset", pico8_memset},
-  {"print", pico8_print},
-  {"printh", pico8_print},
   {NULL, NULL}
 };
 
