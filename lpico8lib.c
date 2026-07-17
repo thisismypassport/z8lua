@@ -614,6 +614,17 @@ static int pico8_memset(lua_State *l) {
     return 0;
 }
 
+static int pico8_print(lua_State *l) {
+    // (for now?) ignoring print/printh extra args
+    lua_settop(l, 1);
+    pico8_tostr(l);
+    size_t len;
+    const char* s = lua_tolstring(l, -1, &len);
+    luai_writestring(s, len);
+    luai_writeline();
+    return 0;
+}
+
 extern int (*lua_baselib_assert) (lua_State *L);
 extern int (*lua_baselib_getmetatable) (lua_State *L);
 extern int (*lua_baselib_setmetatable) (lua_State *L);
@@ -687,8 +698,6 @@ static const luaL_Reg pico8lib[] = {
   {"assert", lua_baselib_assert},
   {"getmetatable", lua_baselib_getmetatable},
   {"setmetatable", lua_baselib_setmetatable},
-  {"print", lua_baselib_print}, // not exact, but more useful
-  {"printh", lua_baselib_print}, // (no file output support)
   {"peek", pico8_peek},
   {"peek2", pico8_peek2},
   {"peek4", pico8_peek4},
@@ -697,6 +706,8 @@ static const luaL_Reg pico8lib[] = {
   {"poke4", pico8_poke4},
   {"memcpy", pico8_memcpy},
   {"memset", pico8_memset},
+  {"print", pico8_print},
+  {"printh", pico8_print},
   {NULL, NULL}
 };
 

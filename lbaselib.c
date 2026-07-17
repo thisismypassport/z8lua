@@ -474,7 +474,6 @@ int (*lua_baselib_ipairs) (lua_State *L) = luaB_ipairs;
 int (*lua_baselib_inext) (lua_State *L) = ipairsaux;
 int (*lua_baselib_next) (lua_State *L) = luaB_next;
 int (*lua_baselib_pairs) (lua_State *L) = luaB_pairs;
-int (*lua_baselib_print) (lua_State *L) = luaB_print;
 int (*lua_baselib_rawequal) (lua_State *L) = luaB_rawequal;
 int (*lua_baselib_rawlen) (lua_State *L) = luaB_rawlen;
 int (*lua_baselib_rawget) (lua_State *L) = luaB_rawget;
