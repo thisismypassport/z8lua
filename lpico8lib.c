@@ -372,6 +372,164 @@ static int pico8_sub(lua_State* l) {
     return lua_strlib_sub(l);
 }
 
+static int pico8_add(lua_State* l) {
+    int nargs = lua_gettop(l);
+    if (nargs < 2 || !lua_istable(l, 1)) {
+        return 0;
+    }
+    int end = luaL_len(l, 1) + 1;
+    int pos = end;
+    if (nargs >= 3) {
+        pos = luaL_checkint(l, 3);
+        luaL_argcheck(l, 1 <= pos && pos <= end, 2, "position out of bounds");
+        
+        for (int i = end; i > pos; i--) {  /* move up elements */
+            lua_rawgeti(l, 1, i-1);
+            lua_rawseti(l, 1, i);  /* t[i] = t[i-1] */
+        }
+
+        lua_pushvalue(l, 2);
+    }
+
+    lua_pushvalue(l, -1); // save for return
+    lua_rawseti(l, 1, pos);  /* t[pos] = v */
+    return 1;
+}
+
+static int finish_deli(lua_State *l, int idx, int pos, int size) {
+    lua_rawgeti(l, idx, pos);  /* result = t[pos] */
+    for ( ; pos < size; pos++) {
+        lua_rawgeti(l, idx, pos+1);
+        lua_rawseti(l, idx, pos);  /* t[pos] = t[pos+1] */
+    }
+    lua_pushnil(l);
+    lua_rawseti(l, idx, pos);  /* t[pos] = nil */
+    return 1;
+}
+
+static int pico8_deli(lua_State *l) {
+    if (!lua_istable(l, 1)) {
+        return 0;
+    }
+
+    int size = luaL_len(l, 1);
+    int pos = size;
+    if (lua_gettop(l) >= 2)
+        pos = lua_tointeger(l, 2);
+    if (!(pos >= 1 && pos <= size))
+        return 0;
+    
+    return finish_deli(l, 1, pos, size);
+}
+
+static int pico8_del(lua_State *l) {
+    if (!lua_istable(l, 1) || lua_gettop(l) < 2) {
+        return 0;
+    }
+
+    int size = luaL_len(l, 1);
+    for (int i = 1; i <= size; i++) {
+        lua_rawgeti(l, 1, i);
+        if (lua_compare(l, -1, 2, LUA_OPEQ))
+            return finish_deli(l, 1, i, size);
+        lua_pop(l, 1);
+    }
+    return 0;
+}
+
+static int pico8_count(lua_State *l) {
+    if (!lua_istable(l, 1)) {
+        return 0;
+    } else if (lua_gettop(l) == 1) {
+        lua_pushinteger(l, luaL_len(l, 1));
+        return 1;
+    }
+
+    int size = luaL_len(l, 1);
+    int count = 0;
+    for (int i = 1; i <= size; i++) {
+        lua_rawgeti(l, 1, i);
+        if (lua_compare(l, -1, 2, LUA_OPEQ))
+            count++;
+        lua_pop(l, 1);
+    }
+    lua_pushinteger(l, count);
+    return 1;
+}
+
+static int inner_all(lua_State *l, int uv_table, int uv_idx, int uv_prev, int* ended) {
+    if (lua_isnil(l, uv_table)) {
+        lua_pushnil(l);
+        return 1;
+    }
+
+    int idx = lua_tointeger(l, uv_idx);
+    lua_pushinteger(l, idx);
+    lua_gettable(l, uv_table);
+    
+    if (lua_compare(l, -1, uv_prev, LUA_OPEQ)) {
+        lua_pop(l, 1);
+        int size = luaL_len(l, uv_table);
+
+        while (1) {
+            idx++;
+            if (idx > size) {
+                lua_pushnil(l);
+                if (ended) *ended = 1;
+                break;
+            }
+
+            lua_pushinteger(l, idx);
+            lua_gettable(l, uv_table);
+            if (!lua_isnil(l, -1))
+                break;
+            lua_pop(l, 1);
+        }
+    }
+    
+    // -1 is the value to return
+    lua_pushinteger(l, idx);
+    lua_replace(l, uv_idx);
+    lua_pushvalue(l, -1);
+    lua_replace(l, uv_prev);
+    return 1;
+}
+
+static int pico8_all_closure(lua_State *l) {
+    return inner_all(l, lua_upvalueindex(1), lua_upvalueindex(2), lua_upvalueindex(3), NULL);
+}
+
+static int pico8_all(lua_State *l) {
+    lua_pushvalue(l, 1);
+    lua_pushinteger(l, 1);
+    lua_pushnil(l);
+    lua_pushcclosure(l, pico8_all_closure, 3);
+    return 1;
+}
+
+static int pico8_foreach(lua_State *l) {
+    lua_settop(l, 2);
+    lua_pushvalue(l, 1);
+    lua_pushinteger(l, 1);
+    lua_pushnil(l);
+
+    int ended = 0;
+    while (1) {
+        inner_all(l, 3, 4, 5, &ended);
+        if (ended)
+            break;
+        
+        lua_pushvalue(l, 2);
+        lua_insert(l, -2);
+        lua_call(l, 1, 0);
+    }
+    return 0;
+}
+
+extern int (*lua_baselib_inext) (lua_State *L);
+extern int (*lua_tablib_pack) (lua_State *L);
+extern int (*lua_tablib_unpack) (lua_State *L);
+
 static const luaL_Reg pico8lib[] = {
   {"max",   pico8_max},
   {"min",   pico8_min},
@@ -399,6 +557,15 @@ static const luaL_Reg pico8lib[] = {
   {"ord",   pico8_ord},
   {"split", pico8_split},
   {"sub",   pico8_sub},
+  {"add",   pico8_add},
+  {"deli",  pico8_deli},
+  {"del",   pico8_del},
+  {"count", pico8_count},
+  {"all",   pico8_all},
+  {"foreach",pico8_foreach},
+  {"inext", lua_baselib_inext},
+  {"pack",  lua_tablib_pack},
+  {"unpack",lua_tablib_unpack},
   {NULL, NULL}
 };
 

@@ -239,7 +239,7 @@ static int luaB_pairs (lua_State *L) {
 
 
 static int ipairsaux (lua_State *L) {
-  int i = luaL_checkint(L, 2);
+  int i = lua_tointeger(L, 2);
   luaL_checktype(L, 1, LUA_TTABLE);
   i++;  /* next value */
   lua_pushinteger(L, i);
@@ -467,3 +467,4 @@ LUAMOD_API int luaopen_base (lua_State *L) {
   return 1;
 }
 
+int (*lua_baselib_inext) (lua_State *L) = ipairsaux;

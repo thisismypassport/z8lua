@@ -283,3 +283,6 @@ LUAMOD_API int luaopen_table (lua_State *L) {
   return 1;
 }
 
+int (*lua_tablib_pack) (lua_State *L) = pack;
+int (*lua_tablib_unpack) (lua_State *L) = unpack;
+
