@@ -257,7 +257,13 @@ LUA_API void  (lua_rawsetp) (lua_State *L, int idx, const void *p);
 LUA_API int   (lua_setmetatable) (lua_State *L, int objindex);
 LUA_API void  (lua_setuservalue) (lua_State *L, int idx);
 
+/*
+** pico8 memory functions
+*/
 LUA_API void  (lua_setpico8memory) (lua_State *L, unsigned char const *p);
+LUA_API void  (lua_setpico8memory_64k) (lua_State *L, unsigned char *p);
+LUA_API lua_Number  (lua_pico8peek) (lua_State *L, unsigned int addr, int count);
+LUA_API void  (lua_pico8poke) (lua_State *L, unsigned int addr, int count, lua_Number value);
 
 /*
 ** 'load' and 'call' functions (load and run Lua code)

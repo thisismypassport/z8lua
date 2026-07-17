@@ -134,9 +134,39 @@ LUA_API lua_CFunction lua_atpanic (lua_State *L, lua_CFunction panicf) {
 }
 
 
-LUA_API void lua_setpico8memory (lua_State *L, unsigned char const *p) {
+static void setpico8memory (lua_State *L, unsigned char *p, unsigned int size) {
   lua_lock(L);
-  G(L)->pico8memory = p;
+  global_State *g = G(L);
+  if (g->pico8memory_owned)
+    luaM_freearray(L, g->pico8memory, g->pico8memory_size);
+  g->pico8memory = p;
+  g->pico8memory_size = size;
+  g->pico8memory_owned = 0;
+  lua_unlock(L);
+}
+
+
+LUA_API void lua_setpico8memory (lua_State *L, unsigned char const *p) {
+  setpico8memory(L, (unsigned char*) p, 0x8000);
+}
+
+
+LUA_API void lua_setpico8memory_64k (lua_State *L, unsigned char *p) {
+  setpico8memory(L, p, 0x10000);
+}
+
+
+LUA_API lua_Number  (lua_pico8peek) (lua_State *L, unsigned int addr, int count) {
+  lua_lock(L);
+  lua_Number val = luaV_peek(L, addr, count);
+  lua_unlock(L);
+  return val;
+}
+
+
+LUA_API void  (lua_pico8poke) (lua_State *L, unsigned int addr, int count, lua_Number value) {
+  lua_lock(L);
+  luaV_poke(L, addr, count, value);
   lua_unlock(L);
 }
 

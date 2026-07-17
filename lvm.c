@@ -217,26 +217,52 @@ static int call_orderTM (lua_State *L, const TValue *p1, const TValue *p2,
     return !l_isfalse(L->top);
 }
 
-
-#define PEEK(ram, address) (ram && (address < 0x8000) ? ram[address] : 0)
-
-lua_Number luaV_peek(struct lua_State *L, lua_Number a, int count)
+static unsigned char *pico8memory(lua_State *L)
 {
-  unsigned char const *p = G(L)->pico8memory;
-  int address = int(a) & 0x7fff;
+  unsigned char *p = G(L)->pico8memory;
+  if (!p) {
+    G(L)->pico8memory_size = 0x10000;
+    G(L)->pico8memory = p = luaM_newvector(L, G(L)->pico8memory_size, unsigned char);
+    G(L)->pico8memory_owned = 1;
+  }
+  return p;
+}
+
+lua_Number luaV_peek(lua_State *L, unsigned int addr, int count)
+{
+  unsigned char *p = pico8memory (L);
+  uint32_t mask = G(L)->pico8memory_size - 1;
   uint32_t ret = 0;
   switch (count) {
     case 4:
-      ret |= PEEK(p, address + 1) << 8;
-      ret |= PEEK(p, address);
-      address += 2;
+      ret |= p[(addr + 1) & mask] << 8;
+      ret |= p[addr & mask];
+      addr += 2;
     case 2:
-      ret |= PEEK(p, address + 1) << 24;
+      ret |= p[(addr + 1) & mask] << 24;
     case 1:
-      ret |= PEEK(p, address) << 16;
+      ret |= p[addr & mask] << 16;
       break;
   }
   return lua_Number::frombits(ret);
+}
+
+void luaV_poke(lua_State *L, unsigned int addr, int count, lua_Number value)
+{
+  unsigned char *p = pico8memory (L);
+  uint32_t mask = G(L)->pico8memory_size - 1;
+  uint32_t val = value.bits();
+  switch (count) {
+    case 4:
+      p[(addr + 1) & mask] = val >> 8;
+      p[addr & mask] = val;
+      addr += 2;
+    case 2:
+      p[(addr + 1) & mask] = val >> 24;
+    case 1:
+      p[addr & mask] = val >> 16;
+      break;
+  }
 }
 
 

@@ -526,6 +526,94 @@ static int pico8_foreach(lua_State *l) {
     return 0;
 }
 
+static int pico8_peek_n(lua_State *l, int count) {
+    unsigned int addr = lua_tonumber(l, 1);
+    if (lua_gettop(l) >= 2) {
+        int npeek = lua_tointeger(l, 2);
+        lua_checkstack(l, npeek);
+        for (int i = 0; i < npeek; i++) {
+            lua_pushnumber(l, lua_pico8peek(l, addr, count));
+            addr += count;
+        }
+        return npeek;
+    } else {
+        lua_pushnumber(l, lua_pico8peek(l, addr, count));
+        return 1;
+    }
+}
+
+static int pico8_peek(lua_State *l) {
+    return pico8_peek_n(l, 1);
+}
+static int pico8_peek2(lua_State *l) {
+    return pico8_peek_n(l, 2);
+}
+static int pico8_peek4(lua_State *l) {
+    return pico8_peek_n(l, 4);
+}
+
+static int pico8_poke_n(lua_State *l, int count) {
+    unsigned int addr = lua_tonumber(l, 1);
+    int nargs = lua_gettop(l);
+    if (nargs >= 3) {
+        for (int i = 2; i <= nargs; i++) {
+            lua_pico8poke(l, addr, count, lua_tonumber(l, i));
+            addr += count;
+        }
+    } else {
+        lua_pico8poke(l, addr, count, lua_tonumber(l, 2));
+    }
+
+    lua_pushinteger(l, 0); // always?
+    return 1;
+}
+
+static int pico8_poke(lua_State *l) {
+    return pico8_poke_n(l, 1);
+}
+static int pico8_poke2(lua_State *l) {
+    return pico8_poke_n(l, 2);
+}
+static int pico8_poke4(lua_State *l) {
+    return pico8_poke_n(l, 4);
+}
+
+static int pico8_memcpy(lua_State *l) {
+    unsigned int daddr = lua_tonumber(l, 1);
+    unsigned int saddr = lua_tonumber(l, 2);
+    int count = lua_tointeger(l, 3);
+
+    if (count > 0) {
+        daddr &= 0xffff;
+        saddr &= 0xffff;
+        if (daddr > saddr && daddr < saddr + count) { // TODO: insufficient check (but so is pico8's...)
+            daddr += count;
+            saddr += count;
+            for (int i = 0; i < count; i++) {
+                lua_Number val = lua_pico8peek(l, --saddr, 1);
+                lua_pico8poke(l, --daddr, 1, val);
+            }
+        } else {
+            for (int i = 0; i < count; i++) {
+                lua_Number val = lua_pico8peek(l, saddr++, 1);
+                lua_pico8poke(l, daddr++, 1, val);
+            }
+        }
+    }
+    return 0;
+}
+
+static int pico8_memset(lua_State *l) {
+    unsigned int addr = lua_tonumber(l, 1);
+    int val = lua_tointeger(l, 2);
+    int count = lua_tointeger(l, 3);
+
+    for (int i = 0; i < count; i++) {
+        lua_pico8poke(l, addr++, 1, val);
+    }
+    return 0;
+}
+
 extern int (*lua_baselib_assert) (lua_State *L);
 extern int (*lua_baselib_getmetatable) (lua_State *L);
 extern int (*lua_baselib_setmetatable) (lua_State *L);
@@ -601,6 +689,14 @@ static const luaL_Reg pico8lib[] = {
   {"setmetatable", lua_baselib_setmetatable},
   {"print", lua_baselib_print}, // not exact, but more useful
   {"printh", lua_baselib_print}, // (no file output support)
+  {"peek", pico8_peek},
+  {"peek2", pico8_peek2},
+  {"peek4", pico8_peek4},
+  {"poke", pico8_poke},
+  {"poke2", pico8_poke2},
+  {"poke4", pico8_poke4},
+  {"memcpy", pico8_memcpy},
+  {"memset", pico8_memset},
   {NULL, NULL}
 };
 
