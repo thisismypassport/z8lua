@@ -95,3 +95,5 @@ assert(tonum(true, 2) == 0x.0001, 6.31)
 assert(tonum(1, 2) == 1, 6.32)
 assert(tonum("abc", 4) == 0, 6.4)
 assert(select('#', tonum({}, 4)) == 0, 6.41)
+
+print("ALL PASSED")

@@ -102,3 +102,5 @@ local t = {11,22,33}
 local i = 1
 assert(select('#', foreach(t,function(v) assert(v == t[i], 10.9); i += 1 end)) == 0, 10)
 assert(i == 4, 10.1)
+
+print("ALL PASSED")

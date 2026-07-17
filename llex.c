@@ -420,8 +420,13 @@ static int llex (LexState *ls, SemInfo *seminfo) {
   for (;;) {
     switch (ls->current) {
       case '\n': case '\r': {  /* line breaks */
+        if (ls->emiteol) { 
+          ls->emiteol--;
+          if (!ls->emiteol)
+            inclinenumber(ls);
+          return TK_EOL;
+        }
         inclinenumber(ls);
-        if (ls->emiteol) { ls->emiteol = 0; return TK_EOL; }
         break;
       }
       case ' ': case '\f': case '\t': case '\v': {  /* spaces */
@@ -430,7 +435,7 @@ static int llex (LexState *ls, SemInfo *seminfo) {
       }
       case '?': {  /* '?' (shorthand print) */
         next(ls);
-        ls->emiteol = 1;
+        ls->emiteol++;
         return TK_PRINT;
       }
       case '-': {  /* '-' or '-=' or '--' (comment) */

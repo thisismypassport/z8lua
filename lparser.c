@@ -1292,7 +1292,7 @@ static void whilestat (LexState *ls, int line) {
   int short_while = ls->t.token != TK_DO && ls->t.token != TK_EOS
                  && ls->braces == 0 && line == ls->linenumber;
   if (short_while)
-    ls->emiteol = 1;
+    ls->emiteol++;
   else
     checknext(ls, TK_DO);
   block(ls);
@@ -1302,7 +1302,7 @@ static void whilestat (LexState *ls, int line) {
   else if (ls->t.token == TK_EOL || ls->t.token == TK_EOS)
     luaX_next(ls);  /* eat EOL or EOS */
   else if (block_follow(ls, 1))
-    ls->emiteol = 0;  /* close the short WHILE */
+    ls->emiteol--;  /* close the short WHILE */
   else
     check_match(ls, TK_EOL, TK_WHILE, line);  /* we expected EOL */
   leaveblock(fs);
@@ -1446,7 +1446,7 @@ static int test_then_block (LexState *ls, int *escapelist) {
   short_if &= ls->t.token != TK_THEN && ls->t.token != TK_DO && ls->t.token != TK_EOS
            && ls->braces == 0 && line == ls->linenumber;
   if (short_if)
-    ls->emiteol = 1;
+    ls->emiteol++;
   else if (ls->t.token == TK_DO) /* pico8 if .. do support */
     checknext(ls, TK_DO);
   else
@@ -1492,7 +1492,7 @@ static void ifstat (LexState *ls, int line) {
   else if (ls->t.token == TK_EOL || ls->t.token == TK_EOS)
     luaX_next(ls);  /* eat EOL or EOS */
   else if (block_follow(ls, 1))
-    ls->emiteol = 0;  /* close the short IF */
+    ls->emiteol--;  /* close the short IF */
   else
     check_match(ls, TK_EOL, TK_IF, line);  /* we expected EOL */
   luaK_patchtohere(fs, escapelist);  /* patch escape list to 'if' end */

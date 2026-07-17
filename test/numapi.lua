@@ -61,3 +61,5 @@ assert(sgn(0) == 1, 13.2)
 
 -- intentionally not implemented:
 --   rnd/srand
+
+print("ALL PASSED")

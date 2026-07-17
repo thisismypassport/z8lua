@@ -37,3 +37,5 @@ memcpy(0xffff, 0, 4)
 assert(peek4(0xffff) == 0x1234.5678, 3.3)
 memset(0xffff, 0xee, 0x10)
 assert(peek4(1) == 0xeeee.eeee, 3.4)
+
+print("ALL PASSED")
