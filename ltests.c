@@ -876,12 +876,10 @@ static lua_State *getstate (lua_State *L) {
 static int loadlib (lua_State *L) {
   static const luaL_Reg libs[] = {
     {"_G", luaopen_base},
-    {"_G", luaopen_pico8},
-    {"_G", luaopen_coroutine_pico8},
-    //{LUA_COLIBNAME, luaopen_coroutine},
-    //{LUA_TABLIBNAME, luaopen_table},
-    //{LUA_STRLIBNAME, luaopen_string},
-    //{LUA_DBLIBNAME, luaopen_debug},
+    {"coroutine", luaopen_coroutine},
+    {"string", luaopen_string},
+    {"debug", luaopen_debug},
+    {"table", luaopen_table},
     {NULL, NULL}
   };
   lua_State *L1 = getstate(L);

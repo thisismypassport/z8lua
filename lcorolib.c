@@ -153,20 +153,7 @@ LUAMOD_API int luaopen_coroutine (lua_State *L) {
   return 1;
 }
 
-
-static const luaL_Reg co_funcs_p8[] = {
-  {"cocreate", luaB_cocreate},
-  {"coresume", luaB_coresume},
-  {"costatus", luaB_costatus},
-  {"yield", luaB_yield},
-  {NULL, NULL}
-};
-
-
-
-LUAMOD_API int luaopen_coroutine_pico8 (lua_State *L) {
-  lua_pushglobaltable(L);
-  luaL_setfuncs(L, co_funcs_p8, 0);
-  return 1;
-}
-
+int (*lua_corolib_cocreate) (lua_State *L) = luaB_cocreate;
+int (*lua_corolib_coresume) (lua_State *L) = luaB_coresume;
+int (*lua_corolib_costatus) (lua_State *L) = luaB_costatus;
+int (*lua_corolib_yield) (lua_State *L) = luaB_yield;

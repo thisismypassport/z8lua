@@ -526,9 +526,26 @@ static int pico8_foreach(lua_State *l) {
     return 0;
 }
 
+extern int (*lua_baselib_assert) (lua_State *L);
+extern int (*lua_baselib_getmetatable) (lua_State *L);
+extern int (*lua_baselib_setmetatable) (lua_State *L);
+extern int (*lua_baselib_ipairs) (lua_State *L);
 extern int (*lua_baselib_inext) (lua_State *L);
+extern int (*lua_baselib_next) (lua_State *L);
+extern int (*lua_baselib_pairs) (lua_State *L);
+extern int (*lua_baselib_print) (lua_State *L);
+extern int (*lua_baselib_rawequal) (lua_State *L);
+extern int (*lua_baselib_rawlen) (lua_State *L);
+extern int (*lua_baselib_rawget) (lua_State *L);
+extern int (*lua_baselib_rawset) (lua_State *L);
+extern int (*lua_baselib_select) (lua_State *L);
+extern int (*lua_baselib_type) (lua_State *L);
 extern int (*lua_tablib_pack) (lua_State *L);
 extern int (*lua_tablib_unpack) (lua_State *L);
+extern int (*lua_corolib_cocreate) (lua_State *L);
+extern int (*lua_corolib_coresume) (lua_State *L);
+extern int (*lua_corolib_costatus) (lua_State *L);
+extern int (*lua_corolib_yield) (lua_State *L);
 
 static const luaL_Reg pico8lib[] = {
   {"max",   pico8_max},
@@ -563,9 +580,27 @@ static const luaL_Reg pico8lib[] = {
   {"count", pico8_count},
   {"all",   pico8_all},
   {"foreach",pico8_foreach},
-  {"inext", lua_baselib_inext},
   {"pack",  lua_tablib_pack},
   {"unpack",lua_tablib_unpack},
+  {"cocreate", lua_corolib_cocreate},
+  {"coresume", lua_corolib_coresume},
+  {"costatus", lua_corolib_costatus},
+  {"yield", lua_corolib_yield},
+  {"inext", lua_baselib_inext},
+  {"ipairs", lua_baselib_ipairs},
+  {"next", lua_baselib_next},
+  {"pairs", lua_baselib_pairs},
+  {"rawequal", lua_baselib_rawequal},
+  {"rawlen", lua_baselib_rawlen},
+  {"rawget", lua_baselib_rawget},
+  {"rawset", lua_baselib_rawset},
+  {"select", lua_baselib_select},
+  {"type", lua_baselib_type},
+  {"assert", lua_baselib_assert},
+  {"getmetatable", lua_baselib_getmetatable},
+  {"setmetatable", lua_baselib_setmetatable},
+  {"print", lua_baselib_print}, // not exact, but more useful
+  {"printh", lua_baselib_print}, // (no file output support)
   {NULL, NULL}
 };
 
