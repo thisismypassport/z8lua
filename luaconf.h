@@ -600,9 +600,32 @@
 static inline z8::fix32 operator/(z8::fix32 x, int y) { return x / z8::fix32(y); }
 static inline z8::fix32 operator+(int x, z8::fix32 y) { return z8::fix32(x) + y; }
 
-static inline bool operator==(z8::fix32 x, int y) { return x == z8::fix32(y); }
-static inline bool operator <(z8::fix32 x, int y) { return x  < z8::fix32(y); }
-static inline bool operator <(int x, z8::fix32 y) { return z8::fix32(x)  < y; }
+
+template <typename T>
+using enable_if_cvt = typename std::enable_if<std::is_same<T, int>::value ||
+	std::is_same<T, int16_t>::value ||
+	std::is_same<T, double>::value>;
+
+template<typename T, typename enable_if_cvt<T>::type*...>
+static inline bool operator==(z8::fix32 x, T y) { return x == z8::fix32(y); }
+template<typename T, typename enable_if_cvt<T>::type*...>
+static inline bool operator==(T x, z8::fix32 y) { return z8::fix32 (x) == y; }
+template<typename T, typename enable_if_cvt<T>::type*...>
+static inline bool operator <(z8::fix32 x, T y) { return x < z8::fix32(y); }
+template<typename T, typename enable_if_cvt<T>::type*...>
+static inline bool operator <(T x, z8::fix32 y) { return z8::fix32(x) < y; }
+template<typename T, typename enable_if_cvt<T>::type*...>
+static inline bool operator <=(z8::fix32 x, T y) { return x <= z8::fix32 (y); }
+template<typename T, typename enable_if_cvt<T>::type*...>
+static inline bool operator <=(T x, z8::fix32 y) { return z8::fix32 (x) <= y; }
+template<typename T, typename enable_if_cvt<T>::type*...>
+static inline bool operator >(z8::fix32 x, T y) { return x > z8::fix32 (y); }
+template<typename T, typename enable_if_cvt<T>::type*...>
+static inline bool operator >(T x, z8::fix32 y) { return z8::fix32 (x) > y; }
+template<typename T, typename enable_if_cvt<T>::type*...>
+static inline bool operator >=(z8::fix32 x, T y) { return x >= z8::fix32 (y); }
+template<typename T, typename enable_if_cvt<T>::type*...>
+static inline bool operator >=(T x, z8::fix32 y) { return z8::fix32 (x) >= y; }
 
 #endif
 
