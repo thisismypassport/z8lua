@@ -687,9 +687,15 @@ LUA_API void lua_rawget (lua_State *L, int idx) {
 LUA_API void lua_rawgeti (lua_State *L, int idx, int n) {
   StkId t;
   lua_lock(L);
+  TValue k;
   t = index2addr(L, idx);
   api_check(L, ttistable(t), "table expected");
-  setobj2s(L, L->top, luaH_getint(hvalue(t), n));
+  if (n > 0x7fff) { // hack for ref usage from api
+    setpvalue(&k, cast(void *, (uintptr_t) n));
+    setobj2s(L, L->top, luaH_get(hvalue(t), &k));
+  } else {
+    setobj2s(L, L->top, luaH_getint(hvalue(t), n));
+  }
   api_incr_top(L);
   lua_unlock(L);
 }
@@ -821,11 +827,17 @@ LUA_API void lua_rawset (lua_State *L, int idx) {
 
 LUA_API void lua_rawseti (lua_State *L, int idx, int n) {
   StkId t;
+  TValue k;
   lua_lock(L);
   api_checknelems(L, 1);
   t = index2addr(L, idx);
   api_check(L, ttistable(t), "table expected");
-  luaH_setint(L, hvalue(t), n, L->top - 1);
+  if (n > 0x7fff) { // hack for ref usage from api
+    setpvalue(&k, cast(void *, (uintptr_t) n));
+    setobj2t(L, luaH_set(L, hvalue(t), &k), L->top - 1);
+  } else {
+    luaH_setint(L, hvalue(t), n, L->top - 1);
+  }
   luaC_barrierback(L, gcvalue(t), L->top-1);
   L->top--;
   lua_unlock(L);
