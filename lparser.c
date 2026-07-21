@@ -874,6 +874,8 @@ static void funcargs (LexState *ls, expdesc *f, int line) {
 ** =======================================================================
 */
 
+static void shortprint (LexState *ls, expdesc* f, int expr);
+
 
 static void primaryexp (LexState *ls, expdesc *v) {
   /* primaryexp -> NAME | '(' expr ')' */
@@ -974,6 +976,10 @@ static void simpleexp (LexState *ls, expdesc *v) {
     case TK_FUNCTION: {
       luaX_next(ls);
       body(ls, v, 0, ls->linenumber);
+      return;
+    }
+    case TK_PRINT: {
+      shortprint(ls, v, 1);  /* expr -> shortprint (on a single line) */
       return;
     }
     default: {
@@ -1609,17 +1615,16 @@ static void retstat (LexState *ls) {
 }
 
 
-static void shortprint (LexState *ls) {
+static void shortprint (LexState *ls, expdesc* f, int expr) {
   int line = ls->linenumber;
   FuncState *fs = ls->fs;
 
   /* same as suffixedexp() except we push "print" first */
-  expdesc f;
   TString *n = luaS_new(ls->L, "print");
   ls->t.seminfo.ts = n;
   ls->t.token = TK_NAME;
-  singlevar(ls, &f);
-  luaK_exp2nextreg(fs, &f);
+  singlevar(ls, f);
+  luaK_exp2nextreg(fs, f);
 
   /* now we do the same as funcargs() */
   expdesc args;
@@ -1634,8 +1639,8 @@ static void shortprint (LexState *ls) {
     check_match(ls, TK_EOL, '?', line);
 
   int base, nparams;
-  lua_assert(f.k == VNONRELOC);
-  base = f.u.info;  /* base register for call */
+  lua_assert(f->k == VNONRELOC);
+  base = f->u.info;  /* base register for call */
   if (hasmultret(args.k))
     nparams = LUA_MULTRET;  /* open call */
   else {
@@ -1644,9 +1649,12 @@ static void shortprint (LexState *ls) {
     nparams = fs->freereg - (base+1);
   }
 
-  init_exp(&f, VCALL, luaK_codeABC(fs, OP_CALL, base, nparams+1, 2));
+  init_exp(f, VCALL, luaK_codeABC(fs, OP_CALL, base, nparams+1, expr ? 2 : 1));
   luaK_fixline(fs, line);
-  fs->freereg = fs->nactvar;
+  if (expr)
+    fs->freereg = base+1;
+  else
+    fs->freereg = fs->nactvar;
 }
 
 
@@ -1659,7 +1667,8 @@ static void statement (LexState *ls) {
       break;
     }
     case TK_PRINT: {
-      shortprint(ls);  /* stat -> shortprint (on a single line) */
+      expdesc f;
+      shortprint(ls, &f, 0);  /* stat -> shortprint (on a single line) */
       break;
     }
     case TK_IF: {  /* stat -> ifstat */
